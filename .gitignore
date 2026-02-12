@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+*.pyo
+agency_pm.db
+.DS_Store
