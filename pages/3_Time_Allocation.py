@@ -8,10 +8,12 @@ import pandas as pd
 from datetime import datetime, date
 
 import database as db
+from theme import apply_theme
 
 db.init_db()
 
 st.set_page_config(page_title="Time Allocation - Survey Agency PM", layout="wide")
+apply_theme()
 st.title("Monthly Time Allocation")
 st.caption("Assign employee time (%) to projects for each month. Salary costs are calculated automatically.")
 

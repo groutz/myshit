@@ -10,10 +10,12 @@ import plotly.graph_objects as go
 from datetime import datetime, date
 
 import database as db
+from theme import apply_theme
 
 db.init_db()
 
 st.set_page_config(page_title="Project Budget - Survey Agency PM", layout="wide")
+theme = apply_theme()
 st.title("Project Budget & Margin")
 st.caption("View and manage project costs to calculate expected margins.")
 
@@ -202,9 +204,9 @@ fig = go.Figure(go.Waterfall(
     text=[f"{revenue:,.0f}", f"-{total_personnel:,.0f}", f"-{total_non_personnel:,.0f}", f"{margin:,.0f}"],
     textposition="outside",
     connector={"line": {"color": "rgb(63, 63, 63)"}},
-    increasing={"marker": {"color": "#2ca02c"}},
-    decreasing={"marker": {"color": "#d62728"}},
-    totals={"marker": {"color": "#1f77b4"}},
+    increasing={"marker": {"color": theme["success"]}},
+    decreasing={"marker": {"color": theme["danger"]}},
+    totals={"marker": {"color": theme["primary"]}},
 ))
 fig.update_layout(
     height=350,

@@ -11,6 +11,7 @@ from datetime import datetime, date
 import os
 
 import database as db
+from theme import apply_theme, theme_sidebar, utilization_color, margin_color
 
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
 LOGO_PATH = os.path.join(ASSETS_DIR, "logo.png")
@@ -24,6 +25,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+# Apply theme (CSS injection) and get color dict
+theme = apply_theme()
 
 # Sidebar
 # Display company logo if it exists
@@ -48,6 +52,9 @@ if os.path.exists(LOGO_PATH):
     if st.sidebar.button("Remove Logo", use_container_width=True):
         os.remove(LOGO_PATH)
         st.rerun()
+
+# Theme settings
+theme_sidebar()
 
 if st.sidebar.button("Load Demo Data", use_container_width=True):
     db.seed_demo_data()
@@ -130,13 +137,13 @@ with col_left:
             x=df_forecast["month_label"],
             y=df_forecast["weighted_revenue"],
             name="Weighted Revenue",
-            marker_color="#1f77b4",
+            marker_color=theme["primary"],
         ))
         fig.add_trace(go.Bar(
             x=df_forecast["month_label"],
             y=df_forecast["weighted_profit"],
             name="Weighted Profit",
-            marker_color="#2ca02c",
+            marker_color=theme["success"],
         ))
         fig.update_layout(
             barmode="overlay",
@@ -154,16 +161,7 @@ with col_right:
         df_util = pd.DataFrame(utilization)
         df_util = df_util.sort_values("total_allocation", ascending=True)
 
-        colors = []
-        for val in df_util["total_allocation"]:
-            if val > 100:
-                colors.append("#d62728")  # Over-allocated
-            elif val >= 80:
-                colors.append("#2ca02c")  # Well utilized
-            elif val >= 50:
-                colors.append("#ff7f0e")  # Moderate
-            else:
-                colors.append("#aec7e8")  # Under-utilized
+        colors = [utilization_color(val, theme) for val in df_util["total_allocation"]]
 
         fig = go.Figure(go.Bar(
             x=df_util["total_allocation"],
@@ -173,7 +171,7 @@ with col_right:
             text=df_util["total_allocation"].apply(lambda x: f"{x:.0f}%"),
             textposition="auto",
         ))
-        fig.add_vline(x=100, line_dash="dash", line_color="red", opacity=0.5)
+        fig.add_vline(x=100, line_dash="dash", line_color=theme["danger"], opacity=0.5)
         fig.update_layout(
             height=max(350, len(df_util) * 30),
             margin=dict(l=20, r=20, t=10, b=20),
@@ -215,7 +213,7 @@ with col_b:
         df_margins = df_margins[df_margins["status"].isin(["Active", "Pipeline"])]
         if not df_margins.empty:
             df_margins = df_margins.sort_values("margin_pct", ascending=True)
-            colors = ["#d62728" if x < 0 else "#2ca02c" for x in df_margins["margin_pct"]]
+            colors = [margin_color(x, theme) for x in df_margins["margin_pct"]]
             fig = go.Figure(go.Bar(
                 x=df_margins["margin_pct"],
                 y=df_margins["project_name"],

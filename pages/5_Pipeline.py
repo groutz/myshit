@@ -10,10 +10,12 @@ import plotly.graph_objects as go
 from datetime import datetime, date
 
 import database as db
+from theme import apply_theme, utilization_color
 
 db.init_db()
 
 st.set_page_config(page_title="Pipeline - Survey Agency PM", layout="wide")
+theme = apply_theme()
 st.title("Project Pipeline & Forecasting")
 
 today = date.today()
@@ -132,7 +134,7 @@ with col_right:
         y=["Total_Value", "Weighted_Value"],
         barmode="group",
         labels={"value": "Value", "variable": "Type"},
-        color_discrete_map={"Total_Value": "#aec7e8", "Weighted_Value": "#1f77b4"},
+        color_discrete_map={"Total_Value": theme["light"], "Weighted_Value": theme["primary"]},
     )
     fig.update_layout(height=400, margin=dict(l=20, r=20, t=30, b=20))
     st.plotly_chart(fig, use_container_width=True)
@@ -159,20 +161,20 @@ if forecast:
         x=df_forecast["label"],
         y=df_forecast["weighted_revenue"],
         name="Weighted Revenue",
-        marker_color="#1f77b4",
+        marker_color=theme["primary"],
     ))
     fig.add_trace(go.Bar(
         x=df_forecast["label"],
         y=df_forecast["weighted_profit"],
         name="Weighted Profit",
-        marker_color="#2ca02c",
+        marker_color=theme["success"],
     ))
     fig.add_trace(go.Scatter(
         x=df_forecast["label"],
         y=df_forecast["director_involvement"],
         name="Director Involvement %",
         yaxis="y2",
-        line=dict(color="#d62728", width=2),
+        line=dict(color=theme["danger"], width=2),
         mode="lines+markers",
     ))
     fig.update_layout(
@@ -250,7 +252,7 @@ if directors:
                 title={"text": "Projected Total"},
                 gauge={
                     "axis": {"range": [None, 120]},
-                    "bar": {"color": "#1f77b4"},
+                    "bar": {"color": theme["primary"]},
                     "steps": [
                         {"range": [0, 60], "color": "#d4edda"},
                         {"range": [60, 85], "color": "#fff3cd"},
@@ -295,7 +297,7 @@ if exports_projects or domestic_projects:
             {"Type": "Domestic", "Value": domestic_value},
         ]),
         values="Value", names="Type",
-        color_discrete_map={"Exports": "#1f77b4", "Domestic": "#ff7f0e"},
+        color_discrete_map={"Exports": theme["primary"], "Domestic": theme["warning"]},
         hole=0.4,
     )
     fig.update_layout(height=250, margin=dict(l=10, r=10, t=10, b=10))

@@ -11,10 +11,12 @@ from datetime import datetime, date
 import io
 
 import database as db
+from theme import apply_theme, utilization_color
 
 db.init_db()
 
 st.set_page_config(page_title="Reports - Survey Agency PM", layout="wide")
+theme = apply_theme()
 st.title("Reports & Analytics")
 
 today = date.today()
@@ -254,16 +256,7 @@ elif report_type == "Employee Utilization":
         # Chart
         fig = go.Figure()
         df_sorted = df_util.sort_values("total_allocation", ascending=True)
-        colors = []
-        for val in df_sorted["total_allocation"]:
-            if val > 100:
-                colors.append("#d62728")
-            elif val >= 80:
-                colors.append("#2ca02c")
-            elif val >= 50:
-                colors.append("#ff7f0e")
-            else:
-                colors.append("#aec7e8")
+        colors = [utilization_color(val, theme) for val in df_sorted["total_allocation"]]
 
         fig.add_trace(go.Bar(
             x=df_sorted["total_allocation"],
@@ -351,12 +344,12 @@ elif report_type == "Pipeline Forecast":
         fig.add_trace(go.Scatter(
             x=df_fc["label"], y=df_fc["cum_revenue"],
             name="Cumulative Revenue", fill="tozeroy",
-            line=dict(color="#1f77b4"),
+            line=dict(color=theme["primary"]),
         ))
         fig.add_trace(go.Scatter(
             x=df_fc["label"], y=df_fc["cum_profit"],
             name="Cumulative Profit", fill="tozeroy",
-            line=dict(color="#2ca02c"),
+            line=dict(color=theme["success"]),
         ))
         fig.update_layout(height=350, margin=dict(l=20, r=20, t=30, b=20),
                           yaxis_title="Cumulative Amount")
@@ -415,7 +408,7 @@ elif report_type == "All Projects Margin Summary":
 
         # Margin distribution
         fig = px.histogram(display_m, x="Margin %", nbins=10,
-                          color_discrete_sequence=["#1f77b4"])
+                          color_discrete_sequence=[theme["primary"]])
         fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20))
         st.plotly_chart(fig, use_container_width=True)
 
