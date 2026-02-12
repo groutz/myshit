@@ -8,8 +8,12 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, date
+import os
 
 import database as db
+
+ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
+LOGO_PATH = os.path.join(ASSETS_DIR, "logo.png")
 
 # Initialize database
 db.init_db()
@@ -22,9 +26,31 @@ st.set_page_config(
 )
 
 # Sidebar
+# Display company logo if it exists
+if os.path.exists(LOGO_PATH):
+    st.sidebar.image(LOGO_PATH, use_container_width=True)
+
 st.sidebar.title("Survey Agency PM")
 st.sidebar.caption("Project & HR Management")
 st.sidebar.divider()
+
+# Company logo upload
+with st.sidebar.expander("Company Logo"):
+    if os.path.exists(LOGO_PATH):
+        st.success("Logo is set.")
+        if st.button("Remove Logo"):
+            os.remove(LOGO_PATH)
+            st.rerun()
+    uploaded_logo = st.file_uploader(
+        "Upload new logo", type=["png", "jpg", "jpeg", "svg"],
+        label_visibility="collapsed",
+    )
+    if uploaded_logo is not None:
+        os.makedirs(ASSETS_DIR, exist_ok=True)
+        with open(LOGO_PATH, "wb") as f:
+            f.write(uploaded_logo.getbuffer())
+        st.success("Logo uploaded!")
+        st.rerun()
 
 if st.sidebar.button("Load Demo Data", use_container_width=True):
     db.seed_demo_data()
