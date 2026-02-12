@@ -35,21 +35,18 @@ st.sidebar.caption("Project & HR Management")
 st.sidebar.divider()
 
 # Company logo upload
-with st.sidebar.expander("Company Logo"):
-    if os.path.exists(LOGO_PATH):
-        st.success("Logo is set.")
-        if st.button("Remove Logo"):
-            os.remove(LOGO_PATH)
-            st.rerun()
-    uploaded_logo = st.file_uploader(
-        "Upload new logo", type=["png", "jpg", "jpeg", "svg"],
-        label_visibility="collapsed",
-    )
-    if uploaded_logo is not None:
-        os.makedirs(ASSETS_DIR, exist_ok=True)
-        with open(LOGO_PATH, "wb") as f:
-            f.write(uploaded_logo.getbuffer())
-        st.success("Logo uploaded!")
+uploaded_logo = st.sidebar.file_uploader(
+    "Upload Company Logo", type=["png", "jpg", "jpeg", "svg"],
+)
+if uploaded_logo is not None:
+    os.makedirs(ASSETS_DIR, exist_ok=True)
+    with open(LOGO_PATH, "wb") as f:
+        f.write(uploaded_logo.getbuffer())
+    st.rerun()
+
+if os.path.exists(LOGO_PATH):
+    if st.sidebar.button("Remove Logo", use_container_width=True):
+        os.remove(LOGO_PATH)
         st.rerun()
 
 if st.sidebar.button("Load Demo Data", use_container_width=True):
