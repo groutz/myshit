@@ -185,6 +185,7 @@ if forecast:
         line=dict(color=theme["danger"], width=2),
         mode="lines+markers",
     ))
+    fig.update_layout(**pt)
     fig.update_layout(
         barmode="group",
         height=400,
@@ -192,7 +193,6 @@ if forecast:
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         yaxis=dict(title="Amount"),
         yaxis2=dict(title="Director %", overlaying="y", side="right", range=[0, 100]),
-        **pt,
     )
     st.plotly_chart(fig, use_container_width=True)
 
