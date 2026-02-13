@@ -75,7 +75,7 @@ st.dataframe(
         "Weighted Profit": "{:,.0f}",
         "Director Inv. %": "{:.0f}%",
         "Score": "{:.2f}",
-    }).background_gradient(subset=["Score"], cmap="RdYlGn"),
+    }),
     use_container_width=True,
     hide_index=True,
 )

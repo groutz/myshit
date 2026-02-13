@@ -488,7 +488,7 @@ elif report_type == "Director Involvement":
 
     st.markdown("**Monthly Allocation % by Director**")
     st.dataframe(
-        pivot.style.format("{:.0f}%").background_gradient(cmap="YlOrRd", vmin=0, vmax=100),
+        pivot.style.format("{:.0f}%"),
         use_container_width=True,
     )
 
