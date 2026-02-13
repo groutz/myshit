@@ -14,7 +14,7 @@ from theme import apply_theme
 
 db.init_db()
 
-st.set_page_config(page_title="Project Budget - Survey Agency PM", layout="wide")
+st.set_page_config(page_title="Project Budget - Survey Agency PM", page_icon="💰", layout="wide")
 theme = apply_theme()
 st.title("Project Budget & Margin")
 st.caption("View and manage project costs to calculate expected margins.")
@@ -130,7 +130,8 @@ if budget_items:
         fig = px.pie(cat_summary, values="Total", names="Category",
                      color_discrete_sequence=px.colors.qualitative.Set2,
                      hole=0.3)
-        fig.update_layout(height=250, margin=dict(l=10, r=10, t=10, b=10))
+        fig.update_layout(height=250, margin=dict(l=10, r=10, t=10, b=10),
+                          paper_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig, use_container_width=True)
 
 total_non_personnel = db.get_budget_total(project_id)
@@ -212,6 +213,8 @@ fig.update_layout(
     height=350,
     margin=dict(l=20, r=20, t=30, b=20),
     showlegend=False,
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
 )
 st.plotly_chart(fig, use_container_width=True)
 

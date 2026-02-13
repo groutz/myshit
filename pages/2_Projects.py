@@ -11,9 +11,10 @@ from theme import apply_theme
 
 db.init_db()
 
-st.set_page_config(page_title="Projects - Survey Agency PM", layout="wide")
+st.set_page_config(page_title="Projects - Survey Agency PM", page_icon="📁", layout="wide")
 apply_theme()
 st.title("Project Management")
+st.caption("Track projects from pipeline to completion.")
 
 # --- Add Project ---
 with st.expander("Add New Project", expanded=False):

@@ -11,7 +11,7 @@ from datetime import datetime, date
 import os
 
 import database as db
-from theme import apply_theme, theme_sidebar, utilization_color, margin_color
+from theme import apply_theme, theme_sidebar, utilization_color, margin_color, section_header
 
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
 LOGO_PATH = os.path.join(ASSETS_DIR, "logo.png")
@@ -21,7 +21,7 @@ db.init_db()
 
 st.set_page_config(
     page_title="Survey Agency PM",
-    page_icon="",
+    page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -34,48 +34,52 @@ theme = apply_theme()
 if os.path.exists(LOGO_PATH):
     st.sidebar.image(LOGO_PATH, use_container_width=True)
 
-st.sidebar.title("Survey Agency PM")
+st.sidebar.title("📊 Survey Agency PM")
 st.sidebar.caption("Project & HR Management")
 st.sidebar.divider()
 
-# Company logo upload
-uploaded_logo = st.sidebar.file_uploader(
-    "Upload Company Logo", type=["png", "jpg", "jpeg", "svg"],
+st.sidebar.markdown(
+    """
+    **Pages**
+
+    🏠 **Dashboard** — Overview\n
+    👥 **Employees** — Staff management\n
+    📁 **Projects** — Project tracking\n
+    🕐 **Time Allocation** — Monthly assignments\n
+    💰 **Project Budget** — Costs & margins\n
+    📈 **Pipeline** — Forecasting\n
+    📋 **Reports** — Analytics & exports
+    """
 )
-if uploaded_logo is not None:
-    os.makedirs(ASSETS_DIR, exist_ok=True)
-    with open(LOGO_PATH, "wb") as f:
-        f.write(uploaded_logo.getbuffer())
-    st.rerun()
 
-if os.path.exists(LOGO_PATH):
-    if st.sidebar.button("Remove Logo", use_container_width=True):
-        os.remove(LOGO_PATH)
-        st.rerun()
-
-# Theme settings
-theme_sidebar()
+st.sidebar.divider()
 
 if st.sidebar.button("Load Demo Data", use_container_width=True):
     db.seed_demo_data()
     st.rerun()
 
-st.sidebar.divider()
-st.sidebar.markdown(
-    """
-    **Navigation**
-    - **Dashboard** (this page)
-    - **Employees** - Manage staff
-    - **Projects** - Manage projects
-    - **Time Allocation** - Monthly assignments
-    - **Project Budget** - Costs & margins
-    - **Pipeline** - Forecasting
-    - **Reports** - Analytics & exports
-    """
-)
+# Company logo & theme settings tucked away
+with st.sidebar.expander("Branding & Theme"):
+    uploaded_logo = st.file_uploader(
+        "Company Logo", type=["png", "jpg", "jpeg", "svg"],
+    )
+    if uploaded_logo is not None:
+        os.makedirs(ASSETS_DIR, exist_ok=True)
+        with open(LOGO_PATH, "wb") as f:
+            f.write(uploaded_logo.getbuffer())
+        st.rerun()
+
+    if os.path.exists(LOGO_PATH):
+        if st.button("Remove Logo", use_container_width=True):
+            os.remove(LOGO_PATH)
+            st.rerun()
+
+# Theme settings
+theme_sidebar()
 
 # Main content
 st.title("Dashboard")
+st.caption("Real-time overview of your projects, people, and pipeline.")
 
 today = date.today()
 current_year = today.year
@@ -90,7 +94,7 @@ utilization = db.get_employee_utilization(current_year, current_month)
 forecast = db.get_monthly_revenue_forecast(current_year, current_month, 12)
 
 # --- KPI Row ---
-st.subheader("Key Metrics")
+section_header("Key Metrics", "Snapshot of current operations")
 kpi1, kpi2, kpi3, kpi4 = st.columns(4)
 
 with kpi1:
@@ -125,7 +129,7 @@ st.divider()
 col_left, col_right = st.columns(2)
 
 with col_left:
-    st.subheader("Revenue Forecast (12 Months)")
+    section_header("Revenue Forecast", "Next 12 months")
     if forecast:
         df_forecast = pd.DataFrame(forecast)
         df_forecast["month_label"] = df_forecast.apply(
@@ -150,13 +154,15 @@ with col_left:
             height=350,
             margin=dict(l=20, r=20, t=30, b=20),
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
         )
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("No forecast data available. Add projects with dates to see forecasts.")
 
 with col_right:
-    st.subheader(f"Employee Utilization - {datetime(current_year, current_month, 1).strftime('%B %Y')}")
+    section_header("Employee Utilization", datetime(current_year, current_month, 1).strftime("%B %Y"))
     if utilization:
         df_util = pd.DataFrame(utilization)
         df_util = df_util.sort_values("total_allocation", ascending=True)
@@ -176,6 +182,8 @@ with col_right:
             height=max(350, len(df_util) * 30),
             margin=dict(l=20, r=20, t=10, b=20),
             xaxis_title="Allocation %",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
         )
         st.plotly_chart(fig, use_container_width=True)
     else:
@@ -187,7 +195,7 @@ st.divider()
 col_a, col_b = st.columns(2)
 
 with col_a:
-    st.subheader("Projects by Status")
+    section_header("Projects by Status")
     if all_projects:
         status_counts = {}
         for p in all_projects:
@@ -200,13 +208,14 @@ with col_a:
             color_discrete_sequence=px.colors.qualitative.Set2,
             hole=0.4,
         )
-        fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20))
+        fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20),
+                          paper_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("No projects yet.")
 
 with col_b:
-    st.subheader("Project Margins")
+    section_header("Project Margins")
     margins = db.get_all_project_margins()
     if margins:
         df_margins = pd.DataFrame(margins)
@@ -226,6 +235,8 @@ with col_b:
                 height=max(300, len(df_margins) * 35),
                 margin=dict(l=20, r=20, t=10, b=20),
                 xaxis_title="Margin %",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
             )
             st.plotly_chart(fig, use_container_width=True)
         else:
@@ -236,7 +247,7 @@ with col_b:
 st.divider()
 
 # --- Director Capacity ---
-st.subheader(f"Director Capacity - {datetime(current_year, current_month, 1).strftime('%B %Y')}")
+section_header("Director Capacity", datetime(current_year, current_month, 1).strftime("%B %Y"))
 directors = db.get_director_capacity(current_year, current_month)
 if directors:
     cols = st.columns(len(directors))
@@ -250,7 +261,7 @@ else:
 
 # --- Active Projects Table ---
 st.divider()
-st.subheader("Active Projects")
+section_header("Active Projects", f"{len(active_projects)} in progress")
 if active_projects:
     df_active = pd.DataFrame(active_projects)[
         ["name", "client", "implementation_method", "contract_value", "start_date", "end_date"]

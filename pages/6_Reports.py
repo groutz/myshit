@@ -15,9 +15,10 @@ from theme import apply_theme, utilization_color
 
 db.init_db()
 
-st.set_page_config(page_title="Reports - Survey Agency PM", layout="wide")
+st.set_page_config(page_title="Reports - Survey Agency PM", page_icon="📋", layout="wide")
 theme = apply_theme()
 st.title("Reports & Analytics")
+st.caption("Detailed reports with CSV export capabilities.")
 
 today = date.today()
 
@@ -119,7 +120,8 @@ if report_type == "Monthly P&L by Project":
         fig.add_trace(go.Bar(x=df_pnl["Project"], y=df_pnl["Monthly Revenue"], name="Revenue"))
         fig.add_trace(go.Bar(x=df_pnl["Project"], y=df_pnl["Personnel Cost"], name="Cost"))
         fig.update_layout(barmode="group", height=350,
-                          margin=dict(l=20, r=20, t=30, b=20))
+                          margin=dict(l=20, r=20, t=30, b=20),
+                          paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig, use_container_width=True)
 
         to_csv_download(df_pnl, f"pnl_{year}_{month:02d}.csv")
@@ -193,7 +195,8 @@ elif report_type == "Employee Cost Allocation":
         with col_c:
             fig = px.pie(by_project, values="Total Cost", names="Project",
                          color_discrete_sequence=px.colors.qualitative.Set2, hole=0.3)
-            fig.update_layout(height=300, margin=dict(l=10, r=10, t=10, b=10))
+            fig.update_layout(height=300, margin=dict(l=10, r=10, t=10, b=10),
+                              paper_bgcolor="rgba(0,0,0,0)")
             st.plotly_chart(fig, use_container_width=True)
 
         to_csv_download(df_alloc, f"cost_allocation_{year}_{month:02d}.csv")
@@ -269,7 +272,8 @@ elif report_type == "Employee Utilization":
         fig.add_vline(x=100, line_dash="dash", line_color="red", opacity=0.5)
         fig.update_layout(height=max(350, len(df_sorted) * 35),
                           margin=dict(l=20, r=20, t=10, b=20),
-                          xaxis_title="Utilization %")
+                          xaxis_title="Utilization %",
+                          paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig, use_container_width=True)
 
         # By role
@@ -352,7 +356,8 @@ elif report_type == "Pipeline Forecast":
             line=dict(color=theme["success"]),
         ))
         fig.update_layout(height=350, margin=dict(l=20, r=20, t=30, b=20),
-                          yaxis_title="Cumulative Amount")
+                          yaxis_title="Cumulative Amount",
+                          paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig, use_container_width=True)
 
         to_csv_download(display_fc, f"pipeline_forecast_{forecast_year}.csv")
@@ -409,7 +414,8 @@ elif report_type == "All Projects Margin Summary":
         # Margin distribution
         fig = px.histogram(display_m, x="Margin %", nbins=10,
                           color_discrete_sequence=[theme["primary"]])
-        fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20))
+        fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20),
+                          paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig, use_container_width=True)
 
         to_csv_download(display_m, "project_margins.csv")
@@ -485,6 +491,8 @@ elif report_type == "Director Involvement":
         margin=dict(l=20, r=20, t=30, b=20),
         yaxis_title="Allocation %",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
     )
     st.plotly_chart(fig, use_container_width=True)
 

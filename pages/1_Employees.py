@@ -11,9 +11,10 @@ from theme import apply_theme
 
 db.init_db()
 
-st.set_page_config(page_title="Employees - Survey Agency PM", layout="wide")
+st.set_page_config(page_title="Employees - Survey Agency PM", page_icon="👥", layout="wide")
 apply_theme()
 st.title("Employee Management")
+st.caption("Add, edit, and track your team members.")
 
 # --- State ---
 if "edit_employee_id" not in st.session_state:

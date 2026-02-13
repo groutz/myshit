@@ -14,9 +14,10 @@ from theme import apply_theme, utilization_color
 
 db.init_db()
 
-st.set_page_config(page_title="Pipeline - Survey Agency PM", layout="wide")
+st.set_page_config(page_title="Pipeline - Survey Agency PM", page_icon="📈", layout="wide")
 theme = apply_theme()
 st.title("Project Pipeline & Forecasting")
+st.caption("Pipeline scoring, revenue forecasts, and capacity planning.")
 
 today = date.today()
 
@@ -117,6 +118,8 @@ with col_left:
         margin=dict(l=20, r=20, t=30, b=20),
         xaxis_title="Likelihood of Winning (%)",
         yaxis_title="Contract Value",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
     )
     st.plotly_chart(fig, use_container_width=True)
 
@@ -136,7 +139,8 @@ with col_right:
         labels={"value": "Value", "variable": "Type"},
         color_discrete_map={"Total_Value": theme["light"], "Weighted_Value": theme["primary"]},
     )
-    fig.update_layout(height=400, margin=dict(l=20, r=20, t=30, b=20))
+    fig.update_layout(height=400, margin=dict(l=20, r=20, t=30, b=20),
+                      paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(fig, use_container_width=True)
 
 # ===================================================================
@@ -184,6 +188,8 @@ if forecast:
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         yaxis=dict(title="Amount"),
         yaxis2=dict(title="Director %", overlaying="y", side="right", range=[0, 100]),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
     )
     st.plotly_chart(fig, use_container_width=True)
 
@@ -265,7 +271,8 @@ if directors:
                     },
                 },
             ))
-            fig.update_layout(height=200, margin=dict(l=20, r=20, t=40, b=20))
+            fig.update_layout(height=200, margin=dict(l=20, r=20, t=40, b=20),
+                              paper_bgcolor="rgba(0,0,0,0)")
             st.plotly_chart(fig, use_container_width=True)
 else:
     st.info("No directors found. Add employees with the 'Director' role.")
@@ -300,5 +307,6 @@ if exports_projects or domestic_projects:
         color_discrete_map={"Exports": theme["primary"], "Domestic": theme["warning"]},
         hole=0.4,
     )
-    fig.update_layout(height=250, margin=dict(l=10, r=10, t=10, b=10))
+    fig.update_layout(height=250, margin=dict(l=10, r=10, t=10, b=10),
+                      paper_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(fig, use_container_width=True)
