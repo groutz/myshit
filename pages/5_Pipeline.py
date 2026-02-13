@@ -10,13 +10,14 @@ import plotly.graph_objects as go
 from datetime import datetime, date
 
 import database as db
-from theme import apply_theme, utilization_color
+from theme import apply_theme, utilization_color, kpi_card, colored_header, plotly_theme
 
 db.init_db()
 
 st.set_page_config(page_title="Pipeline - Survey Agency PM", page_icon="📈", layout="wide")
 theme = apply_theme()
-st.title("Project Pipeline & Forecasting")
+pt = plotly_theme(theme)
+st.title("📈 Project Pipeline & Forecasting")
 st.caption("Pipeline scoring, revenue forecasts, and capacity planning.")
 
 today = date.today()
@@ -89,20 +90,15 @@ avg_margin = sum(r["Expected Margin %"] for r in rows) / len(rows) if rows else 
 
 k1, k2, k3, k4, k5 = st.columns(5)
 with k1:
-    with st.container(border=True):
-        st.metric("Total Pipeline Value", f"{total_pipeline:,.0f}")
+    kpi_card("Total Pipeline Value", f"{total_pipeline:,.0f}", color=theme["primary"], theme=theme)
 with k2:
-    with st.container(border=True):
-        st.metric("Weighted Value", f"{total_weighted:,.0f}")
+    kpi_card("Weighted Value", f"{total_weighted:,.0f}", color=theme["success"], theme=theme)
 with k3:
-    with st.container(border=True):
-        st.metric("Weighted Profit", f"{total_weighted_profit:,.0f}")
+    kpi_card("Weighted Profit", f"{total_weighted_profit:,.0f}", color=theme["warning"], theme=theme)
 with k4:
-    with st.container(border=True):
-        st.metric("Avg Likelihood", f"{avg_likelihood:.0f}%")
+    kpi_card("Avg Likelihood", f"{avg_likelihood:.0f}%", color=theme["light"], theme=theme)
 with k5:
-    with st.container(border=True):
-        st.metric("Avg Expected Margin", f"{avg_margin:.0f}%")
+    kpi_card("Avg Expected Margin", f"{avg_margin:.0f}%", color=theme["danger"], theme=theme)
 
 # ===================================================================
 # PIPELINE VISUALIZATIONS
@@ -128,8 +124,7 @@ with col_left:
         margin=dict(l=20, r=20, t=30, b=20),
         xaxis_title="Likelihood of Winning (%)",
         yaxis_title="Contract Value",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        **pt,
     )
     st.plotly_chart(fig, use_container_width=True)
 
@@ -149,8 +144,7 @@ with col_right:
         labels={"value": "Value", "variable": "Type"},
         color_discrete_map={"Total_Value": theme["light"], "Weighted_Value": theme["primary"]},
     )
-    fig.update_layout(height=400, margin=dict(l=20, r=20, t=30, b=20),
-                      paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+    fig.update_layout(height=400, margin=dict(l=20, r=20, t=30, b=20), **pt)
     st.plotly_chart(fig, use_container_width=True)
 
 # ===================================================================
@@ -198,8 +192,7 @@ if forecast:
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         yaxis=dict(title="Amount"),
         yaxis2=dict(title="Director %", overlaying="y", side="right", range=[0, 100]),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        **pt,
     )
     st.plotly_chart(fig, use_container_width=True)
 
@@ -225,14 +218,11 @@ if forecast:
     st.divider()
     c1, c2, c3 = st.columns(3)
     with c1:
-        with st.container(border=True):
-            st.metric(f"Forecast Revenue ({forecast_year})", f"{annual_revenue:,.0f}")
+        kpi_card(f"Forecast Revenue ({forecast_year})", f"{annual_revenue:,.0f}", color=theme["primary"], theme=theme)
     with c2:
-        with st.container(border=True):
-            st.metric(f"Forecast Profit ({forecast_year})", f"{annual_profit:,.0f}")
+        kpi_card(f"Forecast Profit ({forecast_year})", f"{annual_profit:,.0f}", color=theme["success"], theme=theme)
     with c3:
-        with st.container(border=True):
-            st.metric("Avg Monthly Revenue", f"{annual_revenue / 12:,.0f}")
+        kpi_card("Avg Monthly Revenue", f"{annual_revenue / 12:,.0f}", color=theme["warning"], theme=theme)
 
 # ===================================================================
 # DIRECTOR CAPACITY PLANNING
@@ -288,7 +278,7 @@ if directors:
                 },
             ))
             fig.update_layout(height=200, margin=dict(l=20, r=20, t=40, b=20),
-                              paper_bgcolor="rgba(0,0,0,0)")
+                              paper_bgcolor="rgba(0,0,0,0)", font=dict(color=theme["text"]))
             st.plotly_chart(fig, use_container_width=True)
 else:
     st.info("No directors found. Add employees with the 'Director' role.")
@@ -302,18 +292,20 @@ st.subheader("Exports-Oriented Pipeline")
 exports_projects = [r for r in rows if r["Exports"] == "Yes"]
 domestic_projects = [r for r in rows if r["Exports"] == "No"]
 
+exports_value = sum(r["Weighted Value"] for r in exports_projects)
+domestic_value = sum(r["Weighted Value"] for r in domestic_projects)
+
 c1, c2 = st.columns(2)
 with c1:
-    with st.container(border=True):
-        exports_value = sum(r["Weighted Value"] for r in exports_projects)
-        st.metric("Exports-Oriented (Weighted)", f"{exports_value:,.0f}")
-        st.caption(f"{len(exports_projects)} project(s)")
-
+    kpi_card(
+        "Exports-Oriented (Weighted)", f"{exports_value:,.0f}",
+        delta=f"{len(exports_projects)} project(s)", color=theme["primary"], theme=theme,
+    )
 with c2:
-    with st.container(border=True):
-        domestic_value = sum(r["Weighted Value"] for r in domestic_projects)
-        st.metric("Domestic (Weighted)", f"{domestic_value:,.0f}")
-        st.caption(f"{len(domestic_projects)} project(s)")
+    kpi_card(
+        "Domestic (Weighted)", f"{domestic_value:,.0f}",
+        delta=f"{len(domestic_projects)} project(s)", color=theme["warning"], theme=theme,
+    )
 
 if exports_projects or domestic_projects:
     fig = px.pie(
@@ -325,6 +317,5 @@ if exports_projects or domestic_projects:
         color_discrete_map={"Exports": theme["primary"], "Domestic": theme["warning"]},
         hole=0.4,
     )
-    fig.update_layout(height=250, margin=dict(l=10, r=10, t=10, b=10),
-                      paper_bgcolor="rgba(0,0,0,0)")
+    fig.update_layout(height=250, margin=dict(l=10, r=10, t=10, b=10), **pt)
     st.plotly_chart(fig, use_container_width=True)

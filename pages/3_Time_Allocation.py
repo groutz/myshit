@@ -8,13 +8,13 @@ import pandas as pd
 from datetime import datetime, date
 
 import database as db
-from theme import apply_theme
+from theme import apply_theme, kpi_card
 
 db.init_db()
 
 st.set_page_config(page_title="Time Allocation - Survey Agency PM", page_icon="🕐", layout="wide")
-apply_theme()
-st.title("Monthly Time Allocation")
+theme = apply_theme()
+st.title("🕐 Monthly Time Allocation")
 st.caption("Assign employee time (%) to projects for each month. Salary costs are calculated automatically.")
 
 # --- Month Selector ---
@@ -182,13 +182,11 @@ if cost_rows:
 
     m1, m2, m3 = st.columns(3)
     with m1:
-        with st.container(border=True):
-            st.metric("Total Payroll", f"{total_salary:,.0f}")
+        kpi_card("Total Payroll", f"{total_salary:,.0f}", color=theme["primary"], theme=theme)
     with m2:
-        with st.container(border=True):
-            st.metric("Allocated to Projects", f"{total_allocated_cost:,.0f}")
+        kpi_card("Allocated to Projects", f"{total_allocated_cost:,.0f}", color=theme["success"], theme=theme)
     with m3:
-        with st.container(border=True):
-            st.metric("Unallocated", f"{unallocated:,.0f}")
+        color = theme["danger"] if unallocated > 0 else theme["success"]
+        kpi_card("Unallocated", f"{unallocated:,.0f}", color=color, theme=theme)
 else:
     st.info("No allocations set for this month. Enter percentages in the grid above.")

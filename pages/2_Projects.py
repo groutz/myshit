@@ -7,13 +7,13 @@ import pandas as pd
 from datetime import datetime, date
 
 import database as db
-from theme import apply_theme
+from theme import apply_theme, kpi_card, colored_header
 
 db.init_db()
 
 st.set_page_config(page_title="Projects - Survey Agency PM", page_icon="📁", layout="wide")
-apply_theme()
-st.title("Project Management")
+theme = apply_theme()
+st.title("📁 Project Management")
 st.caption("Track projects from pipeline to completion.")
 
 # --- Add Project ---
@@ -125,17 +125,13 @@ pipeline_weighted = sum(
 
 m1, m2, m3, m4 = st.columns(4)
 with m1:
-    with st.container(border=True):
-        st.metric("Total Projects", len(projects))
+    kpi_card("Total Projects", len(projects), color=theme["primary"], theme=theme)
 with m2:
-    with st.container(border=True):
-        st.metric("Total Contract Value", f"{total_value:,.0f}")
+    kpi_card("Total Contract Value", f"{total_value:,.0f}", color=theme["success"], theme=theme)
 with m3:
-    with st.container(border=True):
-        st.metric("Active Value", f"{active_value:,.0f}")
+    kpi_card("Active Value", f"{active_value:,.0f}", color=theme["warning"], theme=theme)
 with m4:
-    with st.container(border=True):
-        st.metric("Pipeline (Weighted)", f"{pipeline_weighted:,.0f}")
+    kpi_card("Pipeline (Weighted)", f"{pipeline_weighted:,.0f}", color=theme["light"], theme=theme)
 
 # --- Edit Project ---
 st.divider()
