@@ -111,9 +111,15 @@ if report_type == "Monthly P&L by Project":
         total_margin = df_pnl["Monthly Margin"].sum()
 
         c1, c2, c3 = st.columns(3)
-        c1.metric("Total Monthly Revenue", f"{total_rev:,.0f}")
-        c2.metric("Total Personnel Cost", f"{total_cost:,.0f}")
-        c3.metric("Total Monthly Margin", f"{total_margin:,.0f}")
+        with c1:
+            with st.container(border=True):
+                st.metric("Total Monthly Revenue", f"{total_rev:,.0f}")
+        with c2:
+            with st.container(border=True):
+                st.metric("Total Personnel Cost", f"{total_cost:,.0f}")
+        with c3:
+            with st.container(border=True):
+                st.metric("Total Monthly Margin", f"{total_margin:,.0f}")
 
         # Chart
         fig = go.Figure()
@@ -252,9 +258,15 @@ elif report_type == "Employee Utilization":
         over_count = len(df_util[df_util["total_allocation"] > 100])
 
         c1, c2, c3 = st.columns(3)
-        c1.metric("Average Utilization", f"{avg_util:.0f}%")
-        c2.metric("Unallocated Salary Cost", f"{total_wasted:,.0f}")
-        c3.metric("Over-allocated Staff", over_count)
+        with c1:
+            with st.container(border=True):
+                st.metric("Average Utilization", f"{avg_util:.0f}%")
+        with c2:
+            with st.container(border=True):
+                st.metric("Unallocated Salary Cost", f"{total_wasted:,.0f}")
+        with c3:
+            with st.container(border=True):
+                st.metric("Over-allocated Staff", over_count)
 
         # Chart
         fig = go.Figure()
@@ -335,10 +347,18 @@ elif report_type == "Pipeline Forecast":
 
         # Annual summaries
         c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Annual Gross Revenue", f"{df_fc['revenue'].sum():,.0f}")
-        c2.metric("Annual Weighted Revenue", f"{df_fc['weighted_revenue'].sum():,.0f}")
-        c3.metric("Annual Weighted Profit", f"{df_fc['weighted_profit'].sum():,.0f}")
-        c4.metric("Avg Director Load", f"{df_fc['director_involvement'].mean():.0f}%")
+        with c1:
+            with st.container(border=True):
+                st.metric("Annual Gross Revenue", f"{df_fc['revenue'].sum():,.0f}")
+        with c2:
+            with st.container(border=True):
+                st.metric("Annual Weighted Revenue", f"{df_fc['weighted_revenue'].sum():,.0f}")
+        with c3:
+            with st.container(border=True):
+                st.metric("Annual Weighted Profit", f"{df_fc['weighted_profit'].sum():,.0f}")
+        with c4:
+            with st.container(border=True):
+                st.metric("Avg Director Load", f"{df_fc['director_involvement'].mean():.0f}%")
 
         # Cumulative chart
         fig = go.Figure()
@@ -406,10 +426,18 @@ elif report_type == "All Projects Margin Summary":
         overall_pct = (total_margin / total_rev * 100) if total_rev > 0 else 0
 
         c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Total Revenue", f"{total_rev:,.0f}")
-        c2.metric("Total Cost", f"{total_cost:,.0f}")
-        c3.metric("Total Margin", f"{total_margin:,.0f}")
-        c4.metric("Overall Margin %", f"{overall_pct:.1f}%")
+        with c1:
+            with st.container(border=True):
+                st.metric("Total Revenue", f"{total_rev:,.0f}")
+        with c2:
+            with st.container(border=True):
+                st.metric("Total Cost", f"{total_cost:,.0f}")
+        with c3:
+            with st.container(border=True):
+                st.metric("Total Margin", f"{total_margin:,.0f}")
+        with c4:
+            with st.container(border=True):
+                st.metric("Overall Margin %", f"{overall_pct:.1f}%")
 
         # Margin distribution
         fig = px.histogram(display_m, x="Margin %", nbins=10,

@@ -153,124 +153,43 @@ def apply_theme():
     """Inject CSS overrides for immediate theme effect. Returns theme dict."""
     theme = get_theme()
     font_stack = FONT_CSS.get(theme["font"], FONT_CSS["sans serif"])
-
-    # Derive a subtle tint from the primary color for card accents
     primary = theme["primary"]
     is_dark = theme["background"].lower() in ("#0e1117", "#000000", "#111111")
+    border_color = "rgba(255,255,255,0.10)" if is_dark else "rgba(49,51,63,0.1)"
 
     css = f"""
     <style>
         /* ---- Base ---- */
         .stApp {{
-            background-color: {theme['background']};
+            background-color: {theme['background']} !important;
         }}
         section[data-testid="stSidebar"] {{
-            background-color: {theme['secondary_bg']};
+            background-color: {theme['secondary_bg']} !important;
         }}
 
         /* ---- Typography ---- */
         .stApp, .stApp p, .stApp span, .stApp label,
         .stApp li, .stApp td, .stApp th {{
-            color: {theme['text']};
+            color: {theme['text']} !important;
         }}
-        .stApp h1 {{
-            color: {theme['text']};
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }}
-        .stApp h2, .stApp h3, .stApp h4 {{
-            color: {theme['text']};
-            font-weight: 600;
+        .stApp h1, .stApp h2, .stApp h3, .stApp h4 {{
+            color: {theme['text']} !important;
         }}
         .stApp, .stApp p, .stApp span, .stApp label,
         .stApp h1, .stApp h2, .stApp h3, .stApp h4,
         .stApp li, .stApp td, .stApp th, .stApp input,
         .stApp textarea, .stApp select, .stApp button {{
-            font-family: {font_stack};
+            font-family: {font_stack} !important;
         }}
 
-        /* ---- Primary accent ---- */
+        /* ---- Links ---- */
         .stApp a {{
-            color: {primary};
-        }}
-        button[kind="primary"], .stButton > button[kind="primary"] {{
-            background-color: {primary};
-            border-color: {primary};
+            color: {primary} !important;
         }}
 
-        /* ---- Metric cards ---- */
-        [data-testid="stMetric"] {{
-            background: {theme['secondary_bg']};
-            border: 1px solid {"rgba(255,255,255,0.08)" if is_dark else "rgba(0,0,0,0.06)"};
-            border-left: 4px solid {primary};
-            border-radius: 8px;
-            padding: 12px 16px;
-        }}
-        [data-testid="stMetricLabel"] {{
-            font-size: 0.82rem;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            opacity: 0.75;
-        }}
-        [data-testid="stMetricValue"] {{
-            font-weight: 700;
-        }}
-
-        /* ---- Sidebar polish ---- */
-        section[data-testid="stSidebar"] .stMarkdown h1 {{
-            font-size: 1.3rem;
-        }}
-        section[data-testid="stSidebar"] [data-testid="stExpander"] {{
-            border: none;
-            background: transparent;
-        }}
-
-        /* ---- Data tables ---- */
-        .stDataFrame {{
-            border-radius: 8px;
-            overflow: hidden;
-        }}
-
-        /* ---- Expanders ---- */
-        [data-testid="stExpander"] {{
-            border-radius: 8px;
-            border: 1px solid {"rgba(255,255,255,0.08)" if is_dark else "rgba(0,0,0,0.06)"};
-        }}
-
-        /* ---- Plotly charts container ---- */
-        .stPlotlyChart {{
-            border-radius: 8px;
-        }}
-
-        /* ---- Divider subtlety ---- */
-        [data-testid="stHorizontalRule"] {{
-            opacity: 0.4;
-        }}
-
-        /* ---- Page nav icons in sidebar ---- */
-        section[data-testid="stSidebar"] nav a span {{
-            font-weight: 500;
-        }}
-
-        /* ---- Buttons ---- */
-        .stButton > button {{
-            border-radius: 6px;
-            font-weight: 500;
-            transition: all 0.15s ease;
-        }}
-        .stButton > button:hover {{
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-        }}
-
-        /* ---- Info/Warning/Success/Error boxes ---- */
-        .stAlert {{
-            border-radius: 8px;
-        }}
-
-        /* ---- Tab styling ---- */
-        .stTabs [data-baseweb="tab"] {{
-            font-weight: 500;
+        /* ---- Metric cards (accent stripe via container) ---- */
+        div.metric-card > div[data-testid="stVerticalBlockBorderWrapper"] {{
+            border-left: 4px solid {primary} !important;
         }}
     </style>
     """
@@ -295,19 +214,11 @@ def margin_color(value, theme):
     return theme["success"] if value >= 0 else theme["danger"]
 
 
-def section_header(title, description=None, icon=None):
-    """Render a styled section header with optional icon and description."""
-    icon_html = f'<span style="margin-right:8px;">{icon}</span>' if icon else ""
-    desc_html = (
-        f'<p style="margin:4px 0 0 0;font-size:0.88rem;opacity:0.6;">{description}</p>'
-        if description else ""
-    )
-    st.markdown(
-        f'<div style="margin-bottom:12px;">'
-        f'<h3 style="margin:0;display:flex;align-items:center;">'
-        f'{icon_html}{title}</h3>{desc_html}</div>',
-        unsafe_allow_html=True,
-    )
+def section_header(title, description=None):
+    """Render a styled section header with optional description."""
+    st.subheader(title)
+    if description:
+        st.caption(description)
 
 
 # ---------------------------------------------------------------------------

@@ -107,8 +107,9 @@ for e in employees:
 cols = st.columns(len(role_summary))
 for i, (role_name, data) in enumerate(role_summary.items()):
     with cols[i]:
-        st.metric(role_name, f"{data['count']} staff")
-        st.caption(f"Total monthly: {data['total_salary']:,.0f}")
+        with st.container(border=True):
+            st.metric(role_name, f"{data['count']} staff")
+            st.caption(f"Total monthly: {data['total_salary']:,.0f}")
 
 # --- Edit / Delete ---
 st.divider()
