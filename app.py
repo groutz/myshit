@@ -11,7 +11,10 @@ from datetime import datetime, date
 import os
 
 import database as db
-from theme import apply_theme, theme_sidebar, utilization_color, margin_color, section_header
+from theme import (
+    apply_theme, theme_sidebar, utilization_color, margin_color,
+    kpi_card, colored_header, plotly_theme,
+)
 
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
 LOGO_PATH = os.path.join(ASSETS_DIR, "logo.png")
@@ -28,6 +31,7 @@ st.set_page_config(
 
 # Apply theme (CSS injection) and get color dict
 theme = apply_theme()
+pt = plotly_theme(theme)
 
 # Sidebar logo via st.logo (appears at top of sidebar automatically)
 if os.path.exists(LOGO_PATH):
@@ -88,38 +92,31 @@ utilization = db.get_employee_utilization(current_year, current_month)
 forecast = db.get_monthly_revenue_forecast(current_year, current_month, 12)
 
 # --- KPI Row ---
-section_header("Key Metrics", "Snapshot of current operations")
+colored_header("Key Metrics", "Snapshot of current operations", theme=theme)
 kpi1, kpi2, kpi3, kpi4 = st.columns(4)
 
+pipeline_value = sum(p["contract_value"] for p in pipeline_projects)
+weighted_pipeline = sum(
+    p["contract_value"] * p["likelihood_pct"] / 100 for p in pipeline_projects
+)
+avg_util = 0
+if utilization:
+    avg_util = sum(u["total_allocation"] for u in utilization) / len(utilization)
+
 with kpi1:
-    with st.container(border=True):
-        st.metric("Active Employees", len(employees))
-
+    kpi_card("Active Employees", len(employees), color=theme["primary"], theme=theme)
 with kpi2:
-    with st.container(border=True):
-        st.metric("Active Projects", len(active_projects))
-
+    kpi_card("Active Projects", len(active_projects), color=theme["success"], theme=theme)
 with kpi3:
-    pipeline_value = sum(p["contract_value"] for p in pipeline_projects)
-    weighted_pipeline = sum(
-        p["contract_value"] * p["likelihood_pct"] / 100 for p in pipeline_projects
+    kpi_card(
+        "Pipeline (Weighted)", f"{weighted_pipeline:,.0f}",
+        delta=f"{pipeline_value:,.0f} total", color=theme["warning"], theme=theme,
     )
-    with st.container(border=True):
-        st.metric(
-            "Pipeline (Weighted)",
-            f"{weighted_pipeline:,.0f}",
-            delta=f"{pipeline_value:,.0f} total",
-        )
-
 with kpi4:
-    avg_util = 0
-    if utilization:
-        avg_util = sum(u["total_allocation"] for u in utilization) / len(utilization)
-    with st.container(border=True):
-        st.metric(
-            f"Avg Utilization ({datetime(current_year, current_month, 1).strftime('%b %Y')})",
-            f"{avg_util:.0f}%",
-        )
+    kpi_card(
+        f"Avg Utilization ({datetime(current_year, current_month, 1).strftime('%b %Y')})",
+        f"{avg_util:.0f}%", color=theme["light"], theme=theme,
+    )
 
 st.divider()
 
@@ -127,7 +124,7 @@ st.divider()
 col_left, col_right = st.columns(2)
 
 with col_left:
-    section_header("Revenue Forecast", "Next 12 months")
+    colored_header("Revenue Forecast", "Next 12 months", theme=theme)
     if forecast:
         df_forecast = pd.DataFrame(forecast)
         df_forecast["month_label"] = df_forecast.apply(
@@ -152,15 +149,18 @@ with col_left:
             height=350,
             margin=dict(l=20, r=20, t=30, b=20),
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
+            **pt,
         )
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("No forecast data available. Add projects with dates to see forecasts.")
 
 with col_right:
-    section_header("Employee Utilization", datetime(current_year, current_month, 1).strftime("%B %Y"))
+    colored_header(
+        "Employee Utilization",
+        datetime(current_year, current_month, 1).strftime("%B %Y"),
+        theme=theme,
+    )
     if utilization:
         df_util = pd.DataFrame(utilization)
         df_util = df_util.sort_values("total_allocation", ascending=True)
@@ -180,8 +180,7 @@ with col_right:
             height=max(350, len(df_util) * 30),
             margin=dict(l=20, r=20, t=10, b=20),
             xaxis_title="Allocation %",
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
+            **pt,
         )
         st.plotly_chart(fig, use_container_width=True)
     else:
@@ -193,7 +192,7 @@ st.divider()
 col_a, col_b = st.columns(2)
 
 with col_a:
-    section_header("Projects by Status")
+    colored_header("Projects by Status", theme=theme)
     if all_projects:
         status_counts = {}
         for p in all_projects:
@@ -207,13 +206,13 @@ with col_a:
             hole=0.4,
         )
         fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20),
-                          paper_bgcolor="rgba(0,0,0,0)")
+                          **pt)
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("No projects yet.")
 
 with col_b:
-    section_header("Project Margins")
+    colored_header("Project Margins", theme=theme)
     margins = db.get_all_project_margins()
     if margins:
         df_margins = pd.DataFrame(margins)
@@ -233,8 +232,7 @@ with col_b:
                 height=max(300, len(df_margins) * 35),
                 margin=dict(l=20, r=20, t=10, b=20),
                 xaxis_title="Margin %",
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
+                **pt,
             )
             st.plotly_chart(fig, use_container_width=True)
         else:
@@ -245,22 +243,31 @@ with col_b:
 st.divider()
 
 # --- Director Capacity ---
-section_header("Director Capacity", datetime(current_year, current_month, 1).strftime("%B %Y"))
+colored_header(
+    "Director Capacity",
+    datetime(current_year, current_month, 1).strftime("%B %Y"),
+    theme=theme,
+)
 directors = db.get_director_capacity(current_year, current_month)
 if directors:
     cols = st.columns(len(directors))
     for i, d in enumerate(directors):
         with cols[i]:
-            with st.container(border=True):
-                allocated = d["total_allocation"]
-                available = max(0, 100 - allocated)
-                st.metric(d["name"], f"{allocated:.0f}% allocated", delta=f"{available:.0f}% available")
+            allocated = d["total_allocation"]
+            available = max(0, 100 - allocated)
+            color = theme["success"] if allocated <= 80 else (
+                theme["warning"] if allocated <= 100 else theme["danger"]
+            )
+            kpi_card(
+                d["name"], f"{allocated:.0f}% allocated",
+                delta=f"{available:.0f}% available", color=color, theme=theme,
+            )
 else:
     st.info("No directors found. Add employees with the Director role.")
 
 # --- Active Projects Table ---
 st.divider()
-section_header("Active Projects", f"{len(active_projects)} in progress")
+colored_header("Active Projects", f"{len(active_projects)} in progress", theme=theme)
 if active_projects:
     df_active = pd.DataFrame(active_projects)[
         ["name", "client", "implementation_method", "contract_value", "start_date", "end_date"]

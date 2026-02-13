@@ -11,13 +11,14 @@ from datetime import datetime, date
 import io
 
 import database as db
-from theme import apply_theme, utilization_color
+from theme import apply_theme, utilization_color, kpi_card, colored_header, plotly_theme
 
 db.init_db()
 
 st.set_page_config(page_title="Reports - Survey Agency PM", page_icon="📋", layout="wide")
 theme = apply_theme()
-st.title("Reports & Analytics")
+pt = plotly_theme(theme)
+st.title("📋 Reports & Analytics")
 st.caption("Detailed reports with CSV export capabilities.")
 
 today = date.today()
@@ -112,14 +113,12 @@ if report_type == "Monthly P&L by Project":
 
         c1, c2, c3 = st.columns(3)
         with c1:
-            with st.container(border=True):
-                st.metric("Total Monthly Revenue", f"{total_rev:,.0f}")
+            kpi_card("Total Monthly Revenue", f"{total_rev:,.0f}", color=theme["primary"], theme=theme)
         with c2:
-            with st.container(border=True):
-                st.metric("Total Personnel Cost", f"{total_cost:,.0f}")
+            kpi_card("Total Personnel Cost", f"{total_cost:,.0f}", color=theme["danger"], theme=theme)
         with c3:
-            with st.container(border=True):
-                st.metric("Total Monthly Margin", f"{total_margin:,.0f}")
+            m_color = theme["success"] if total_margin >= 0 else theme["danger"]
+            kpi_card("Total Monthly Margin", f"{total_margin:,.0f}", color=m_color, theme=theme)
 
         # Chart
         fig = go.Figure()
@@ -127,7 +126,7 @@ if report_type == "Monthly P&L by Project":
         fig.add_trace(go.Bar(x=df_pnl["Project"], y=df_pnl["Personnel Cost"], name="Cost"))
         fig.update_layout(barmode="group", height=350,
                           margin=dict(l=20, r=20, t=30, b=20),
-                          paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+                          **pt)
         st.plotly_chart(fig, use_container_width=True)
 
         to_csv_download(df_pnl, f"pnl_{year}_{month:02d}.csv")
@@ -201,8 +200,7 @@ elif report_type == "Employee Cost Allocation":
         with col_c:
             fig = px.pie(by_project, values="Total Cost", names="Project",
                          color_discrete_sequence=px.colors.qualitative.Set2, hole=0.3)
-            fig.update_layout(height=300, margin=dict(l=10, r=10, t=10, b=10),
-                              paper_bgcolor="rgba(0,0,0,0)")
+            fig.update_layout(height=300, margin=dict(l=10, r=10, t=10, b=10), **pt)
             st.plotly_chart(fig, use_container_width=True)
 
         to_csv_download(df_alloc, f"cost_allocation_{year}_{month:02d}.csv")
@@ -259,14 +257,12 @@ elif report_type == "Employee Utilization":
 
         c1, c2, c3 = st.columns(3)
         with c1:
-            with st.container(border=True):
-                st.metric("Average Utilization", f"{avg_util:.0f}%")
+            kpi_card("Average Utilization", f"{avg_util:.0f}%", color=theme["primary"], theme=theme)
         with c2:
-            with st.container(border=True):
-                st.metric("Unallocated Salary Cost", f"{total_wasted:,.0f}")
+            kpi_card("Unallocated Salary Cost", f"{total_wasted:,.0f}", color=theme["warning"], theme=theme)
         with c3:
-            with st.container(border=True):
-                st.metric("Over-allocated Staff", over_count)
+            oc = theme["danger"] if over_count > 0 else theme["success"]
+            kpi_card("Over-allocated Staff", over_count, color=oc, theme=theme)
 
         # Chart
         fig = go.Figure()
@@ -285,7 +281,7 @@ elif report_type == "Employee Utilization":
         fig.update_layout(height=max(350, len(df_sorted) * 35),
                           margin=dict(l=20, r=20, t=10, b=20),
                           xaxis_title="Utilization %",
-                          paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+                          **pt)
         st.plotly_chart(fig, use_container_width=True)
 
         # By role
@@ -348,17 +344,13 @@ elif report_type == "Pipeline Forecast":
         # Annual summaries
         c1, c2, c3, c4 = st.columns(4)
         with c1:
-            with st.container(border=True):
-                st.metric("Annual Gross Revenue", f"{df_fc['revenue'].sum():,.0f}")
+            kpi_card("Annual Gross Revenue", f"{df_fc['revenue'].sum():,.0f}", color=theme["primary"], theme=theme)
         with c2:
-            with st.container(border=True):
-                st.metric("Annual Weighted Revenue", f"{df_fc['weighted_revenue'].sum():,.0f}")
+            kpi_card("Annual Weighted Revenue", f"{df_fc['weighted_revenue'].sum():,.0f}", color=theme["success"], theme=theme)
         with c3:
-            with st.container(border=True):
-                st.metric("Annual Weighted Profit", f"{df_fc['weighted_profit'].sum():,.0f}")
+            kpi_card("Annual Weighted Profit", f"{df_fc['weighted_profit'].sum():,.0f}", color=theme["warning"], theme=theme)
         with c4:
-            with st.container(border=True):
-                st.metric("Avg Director Load", f"{df_fc['director_involvement'].mean():.0f}%")
+            kpi_card("Avg Director Load", f"{df_fc['director_involvement'].mean():.0f}%", color=theme["light"], theme=theme)
 
         # Cumulative chart
         fig = go.Figure()
@@ -377,7 +369,7 @@ elif report_type == "Pipeline Forecast":
         ))
         fig.update_layout(height=350, margin=dict(l=20, r=20, t=30, b=20),
                           yaxis_title="Cumulative Amount",
-                          paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+                          **pt)
         st.plotly_chart(fig, use_container_width=True)
 
         to_csv_download(display_fc, f"pipeline_forecast_{forecast_year}.csv")
@@ -427,23 +419,20 @@ elif report_type == "All Projects Margin Summary":
 
         c1, c2, c3, c4 = st.columns(4)
         with c1:
-            with st.container(border=True):
-                st.metric("Total Revenue", f"{total_rev:,.0f}")
+            kpi_card("Total Revenue", f"{total_rev:,.0f}", color=theme["primary"], theme=theme)
         with c2:
-            with st.container(border=True):
-                st.metric("Total Cost", f"{total_cost:,.0f}")
+            kpi_card("Total Cost", f"{total_cost:,.0f}", color=theme["danger"], theme=theme)
         with c3:
-            with st.container(border=True):
-                st.metric("Total Margin", f"{total_margin:,.0f}")
+            m_color = theme["success"] if total_margin >= 0 else theme["danger"]
+            kpi_card("Total Margin", f"{total_margin:,.0f}", color=m_color, theme=theme)
         with c4:
-            with st.container(border=True):
-                st.metric("Overall Margin %", f"{overall_pct:.1f}%")
+            kpi_card("Overall Margin %", f"{overall_pct:.1f}%", color=theme["warning"], theme=theme)
 
         # Margin distribution
         fig = px.histogram(display_m, x="Margin %", nbins=10,
                           color_discrete_sequence=[theme["primary"]])
         fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20),
-                          paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+                          **pt)
         st.plotly_chart(fig, use_container_width=True)
 
         to_csv_download(display_m, "project_margins.csv")
@@ -519,8 +508,7 @@ elif report_type == "Director Involvement":
         margin=dict(l=20, r=20, t=30, b=20),
         yaxis_title="Allocation %",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        **pt,
     )
     st.plotly_chart(fig, use_container_width=True)
 

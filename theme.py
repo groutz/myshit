@@ -221,6 +221,106 @@ def section_header(title, description=None):
         st.caption(description)
 
 
+def kpi_card(label, value, delta=None, color=None, theme=None):
+    """Render a visually distinct KPI card using inline-styled HTML.
+
+    This uses st.markdown with inline styles so it renders reliably
+    regardless of Streamlit version or CSS selector changes.
+    """
+    if theme is None:
+        theme = get_theme()
+    if color is None:
+        color = theme["primary"]
+
+    is_dark = theme["background"].lower() in ("#0e1117", "#000000", "#111111")
+    card_bg = theme["secondary_bg"]
+    text_color = theme["text"]
+    label_opacity = "0.65" if not is_dark else "0.75"
+
+    delta_html = ""
+    if delta is not None:
+        delta_html = (
+            f'<div style="font-size:0.8rem;color:{color};margin-top:2px;">'
+            f'{delta}</div>'
+        )
+
+    html = f"""
+    <div style="
+        background:{card_bg};
+        border-left:4px solid {color};
+        border-radius:8px;
+        padding:16px 18px 14px 18px;
+        margin-bottom:8px;
+    ">
+        <div style="
+            font-size:0.78rem;
+            text-transform:uppercase;
+            letter-spacing:0.06em;
+            color:{text_color};
+            opacity:{label_opacity};
+            margin-bottom:6px;
+            font-weight:600;
+        ">{label}</div>
+        <div style="
+            font-size:1.6rem;
+            font-weight:700;
+            color:{text_color};
+            line-height:1.2;
+        ">{value}</div>
+        {delta_html}
+    </div>
+    """
+    st.markdown(html, unsafe_allow_html=True)
+
+
+def colored_header(title, description=None, color=None, theme=None):
+    """Render a section header with a colored accent bar."""
+    if theme is None:
+        theme = get_theme()
+    if color is None:
+        color = theme["primary"]
+    text_color = theme["text"]
+
+    desc_html = ""
+    if description:
+        desc_html = (
+            f'<div style="font-size:0.85rem;color:{text_color};opacity:0.6;'
+            f'margin-top:4px;">{description}</div>'
+        )
+
+    html = f"""
+    <div style="
+        border-bottom:3px solid {color};
+        padding-bottom:8px;
+        margin-bottom:16px;
+        margin-top:8px;
+    ">
+        <div style="
+            font-size:1.15rem;
+            font-weight:700;
+            color:{text_color};
+        ">{title}</div>
+        {desc_html}
+    </div>
+    """
+    st.markdown(html, unsafe_allow_html=True)
+
+
+def plotly_theme(theme=None):
+    """Return a dict of common Plotly layout settings for consistent chart styling."""
+    if theme is None:
+        theme = get_theme()
+    is_dark = theme["background"].lower() in ("#0e1117", "#000000", "#111111")
+    grid_color = "rgba(255,255,255,0.08)" if is_dark else "rgba(0,0,0,0.06)"
+    return dict(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color=theme["text"], size=12),
+        xaxis=dict(gridcolor=grid_color, zerolinecolor=grid_color),
+        yaxis=dict(gridcolor=grid_color, zerolinecolor=grid_color),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Sidebar settings UI
 # ---------------------------------------------------------------------------

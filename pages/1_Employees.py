@@ -7,13 +7,13 @@ import pandas as pd
 from datetime import datetime, date
 
 import database as db
-from theme import apply_theme
+from theme import apply_theme, kpi_card, colored_header
 
 db.init_db()
 
 st.set_page_config(page_title="Employees - Survey Agency PM", page_icon="👥", layout="wide")
-apply_theme()
-st.title("Employee Management")
+theme = apply_theme()
+st.title("👥 Employee Management")
 st.caption("Add, edit, and track your team members.")
 
 # --- State ---
@@ -107,9 +107,11 @@ for e in employees:
 cols = st.columns(len(role_summary))
 for i, (role_name, data) in enumerate(role_summary.items()):
     with cols[i]:
-        with st.container(border=True):
-            st.metric(role_name, f"{data['count']} staff")
-            st.caption(f"Total monthly: {data['total_salary']:,.0f}")
+        kpi_card(
+            role_name, f"{data['count']} staff",
+            delta=f"Total monthly: {data['total_salary']:,.0f}",
+            theme=theme,
+        )
 
 # --- Edit / Delete ---
 st.divider()

@@ -10,13 +10,14 @@ import plotly.graph_objects as go
 from datetime import datetime, date
 
 import database as db
-from theme import apply_theme
+from theme import apply_theme, kpi_card, colored_header, plotly_theme
 
 db.init_db()
 
 st.set_page_config(page_title="Project Budget - Survey Agency PM", page_icon="💰", layout="wide")
 theme = apply_theme()
-st.title("Project Budget & Margin")
+pt = plotly_theme(theme)
+st.title("💰 Project Budget & Margin")
 st.caption("View and manage project costs to calculate expected margins.")
 
 # --- Project Selector ---
@@ -37,17 +38,13 @@ st.divider()
 # --- Project Info Header ---
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    with st.container(border=True):
-        st.metric("Contract Value", f"{project['contract_value']:,.0f}")
+    kpi_card("Contract Value", f"{project['contract_value']:,.0f}", color=theme["primary"], theme=theme)
 with col2:
-    with st.container(border=True):
-        st.metric("Status", project["status"])
+    kpi_card("Status", project["status"], color=theme["success"], theme=theme)
 with col3:
-    with st.container(border=True):
-        st.metric("Method", project["implementation_method"])
+    kpi_card("Method", project["implementation_method"], color=theme["warning"], theme=theme)
 with col4:
-    with st.container(border=True):
-        st.metric("Duration", f"{project['expected_duration_months']} months")
+    kpi_card("Duration", f"{project['expected_duration_months']} months", color=theme["light"], theme=theme)
 
 st.divider()
 
@@ -138,8 +135,7 @@ if budget_items:
         fig = px.pie(cat_summary, values="Total", names="Category",
                      color_discrete_sequence=px.colors.qualitative.Set2,
                      hole=0.3)
-        fig.update_layout(height=250, margin=dict(l=10, r=10, t=10, b=10),
-                          paper_bgcolor="rgba(0,0,0,0)")
+        fig.update_layout(height=250, margin=dict(l=10, r=10, t=10, b=10), **pt)
         st.plotly_chart(fig, use_container_width=True)
 
 total_non_personnel = db.get_budget_total(project_id)
@@ -221,8 +217,7 @@ fig.update_layout(
     height=350,
     margin=dict(l=20, r=20, t=30, b=20),
     showlegend=False,
-    paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(0,0,0,0)",
+    **pt,
 )
 st.plotly_chart(fig, use_container_width=True)
 
@@ -235,11 +230,10 @@ if project["expected_margin_pct"]:
     st.subheader("Expected vs. Actual Margin")
     c1, c2, c3 = st.columns(3)
     with c1:
-        with st.container(border=True):
-            st.metric("Expected Margin", f"{expected_margin_amount:,.0f} ({expected_margin_pct:.0f}%)")
+        kpi_card("Expected Margin", f"{expected_margin_amount:,.0f} ({expected_margin_pct:.0f}%)", color=theme["primary"], theme=theme)
     with c2:
-        with st.container(border=True):
-            st.metric("Calculated Margin", f"{margin:,.0f} ({margin_pct:.1f}%)")
+        m_color = theme["success"] if margin >= 0 else theme["danger"]
+        kpi_card("Calculated Margin", f"{margin:,.0f} ({margin_pct:.1f}%)", color=m_color, theme=theme)
     with c3:
-        with st.container(border=True):
-            st.metric("Variance", f"{variance:,.0f}", delta=f"{margin_pct - expected_margin_pct:.1f}pp")
+        v_color = theme["success"] if variance >= 0 else theme["danger"]
+        kpi_card("Variance", f"{variance:,.0f}", delta=f"{margin_pct - expected_margin_pct:.1f}pp", color=v_color, theme=theme)
