@@ -36,10 +36,18 @@ st.divider()
 
 # --- Project Info Header ---
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("Contract Value", f"{project['contract_value']:,.0f}")
-col2.metric("Status", project["status"])
-col3.metric("Method", project["implementation_method"])
-col4.metric("Duration", f"{project['expected_duration_months']} months")
+with col1:
+    with st.container(border=True):
+        st.metric("Contract Value", f"{project['contract_value']:,.0f}")
+with col2:
+    with st.container(border=True):
+        st.metric("Status", project["status"])
+with col3:
+    with st.container(border=True):
+        st.metric("Method", project["implementation_method"])
+with col4:
+    with st.container(border=True):
+        st.metric("Duration", f"{project['expected_duration_months']} months")
 
 st.divider()
 
@@ -226,6 +234,12 @@ if project["expected_margin_pct"]:
     st.divider()
     st.subheader("Expected vs. Actual Margin")
     c1, c2, c3 = st.columns(3)
-    c1.metric("Expected Margin", f"{expected_margin_amount:,.0f} ({expected_margin_pct:.0f}%)")
-    c2.metric("Calculated Margin", f"{margin:,.0f} ({margin_pct:.1f}%)")
-    c3.metric("Variance", f"{variance:,.0f}", delta=f"{margin_pct - expected_margin_pct:.1f}pp")
+    with c1:
+        with st.container(border=True):
+            st.metric("Expected Margin", f"{expected_margin_amount:,.0f} ({expected_margin_pct:.0f}%)")
+    with c2:
+        with st.container(border=True):
+            st.metric("Calculated Margin", f"{margin:,.0f} ({margin_pct:.1f}%)")
+    with c3:
+        with st.container(border=True):
+            st.metric("Variance", f"{variance:,.0f}", delta=f"{margin_pct - expected_margin_pct:.1f}pp")

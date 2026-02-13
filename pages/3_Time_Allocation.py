@@ -181,8 +181,14 @@ if cost_rows:
     unallocated = total_salary - total_allocated_cost
 
     m1, m2, m3 = st.columns(3)
-    m1.metric("Total Payroll", f"{total_salary:,.0f}")
-    m2.metric("Allocated to Projects", f"{total_allocated_cost:,.0f}")
-    m3.metric("Unallocated", f"{unallocated:,.0f}")
+    with m1:
+        with st.container(border=True):
+            st.metric("Total Payroll", f"{total_salary:,.0f}")
+    with m2:
+        with st.container(border=True):
+            st.metric("Allocated to Projects", f"{total_allocated_cost:,.0f}")
+    with m3:
+        with st.container(border=True):
+            st.metric("Unallocated", f"{unallocated:,.0f}")
 else:
     st.info("No allocations set for this month. Enter percentages in the grid above.")

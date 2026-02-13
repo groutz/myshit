@@ -29,28 +29,22 @@ st.set_page_config(
 # Apply theme (CSS injection) and get color dict
 theme = apply_theme()
 
-# Sidebar
-# Display company logo if it exists
+# Sidebar logo via st.logo (appears at top of sidebar automatically)
 if os.path.exists(LOGO_PATH):
-    st.sidebar.image(LOGO_PATH, use_container_width=True)
+    st.logo(LOGO_PATH)
 
-st.sidebar.title("📊 Survey Agency PM")
+st.sidebar.title("Survey Agency PM")
 st.sidebar.caption("Project & HR Management")
 st.sidebar.divider()
 
-st.sidebar.markdown(
-    """
-    **Pages**
-
-    🏠 **Dashboard** — Overview\n
-    👥 **Employees** — Staff management\n
-    📁 **Projects** — Project tracking\n
-    🕐 **Time Allocation** — Monthly assignments\n
-    💰 **Project Budget** — Costs & margins\n
-    📈 **Pipeline** — Forecasting\n
-    📋 **Reports** — Analytics & exports
-    """
-)
+# Page navigation with st.page_link
+st.sidebar.page_link("app.py", label="Dashboard", icon="🏠")
+st.sidebar.page_link("pages/1_Employees.py", label="Employees", icon="👥")
+st.sidebar.page_link("pages/2_Projects.py", label="Projects", icon="📁")
+st.sidebar.page_link("pages/3_Time_Allocation.py", label="Time Allocation", icon="🕐")
+st.sidebar.page_link("pages/4_Project_Budget.py", label="Project Budget", icon="💰")
+st.sidebar.page_link("pages/5_Pipeline.py", label="Pipeline", icon="📈")
+st.sidebar.page_link("pages/6_Reports.py", label="Reports", icon="📋")
 
 st.sidebar.divider()
 
@@ -78,7 +72,7 @@ with st.sidebar.expander("Branding & Theme"):
 theme_sidebar()
 
 # Main content
-st.title("Dashboard")
+st.title("📊 Dashboard")
 st.caption("Real-time overview of your projects, people, and pipeline.")
 
 today = date.today()
@@ -98,30 +92,34 @@ section_header("Key Metrics", "Snapshot of current operations")
 kpi1, kpi2, kpi3, kpi4 = st.columns(4)
 
 with kpi1:
-    st.metric("Active Employees", len(employees))
+    with st.container(border=True):
+        st.metric("Active Employees", len(employees))
 
 with kpi2:
-    st.metric("Active Projects", len(active_projects))
+    with st.container(border=True):
+        st.metric("Active Projects", len(active_projects))
 
 with kpi3:
     pipeline_value = sum(p["contract_value"] for p in pipeline_projects)
     weighted_pipeline = sum(
         p["contract_value"] * p["likelihood_pct"] / 100 for p in pipeline_projects
     )
-    st.metric(
-        "Pipeline (Weighted)",
-        f"{weighted_pipeline:,.0f}",
-        delta=f"{pipeline_value:,.0f} total",
-    )
+    with st.container(border=True):
+        st.metric(
+            "Pipeline (Weighted)",
+            f"{weighted_pipeline:,.0f}",
+            delta=f"{pipeline_value:,.0f} total",
+        )
 
 with kpi4:
     avg_util = 0
     if utilization:
         avg_util = sum(u["total_allocation"] for u in utilization) / len(utilization)
-    st.metric(
-        f"Avg Utilization ({datetime(current_year, current_month, 1).strftime('%b %Y')})",
-        f"{avg_util:.0f}%",
-    )
+    with st.container(border=True):
+        st.metric(
+            f"Avg Utilization ({datetime(current_year, current_month, 1).strftime('%b %Y')})",
+            f"{avg_util:.0f}%",
+        )
 
 st.divider()
 
@@ -253,9 +251,10 @@ if directors:
     cols = st.columns(len(directors))
     for i, d in enumerate(directors):
         with cols[i]:
-            allocated = d["total_allocation"]
-            available = max(0, 100 - allocated)
-            st.metric(d["name"], f"{allocated:.0f}% allocated", delta=f"{available:.0f}% available")
+            with st.container(border=True):
+                allocated = d["total_allocation"]
+                available = max(0, 100 - allocated)
+                st.metric(d["name"], f"{allocated:.0f}% allocated", delta=f"{available:.0f}% available")
 else:
     st.info("No directors found. Add employees with the Director role.")
 

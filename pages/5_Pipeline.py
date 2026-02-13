@@ -88,11 +88,21 @@ avg_likelihood = sum(r["Likelihood"] for r in rows) / len(rows) if rows else 0
 avg_margin = sum(r["Expected Margin %"] for r in rows) / len(rows) if rows else 0
 
 k1, k2, k3, k4, k5 = st.columns(5)
-k1.metric("Total Pipeline Value", f"{total_pipeline:,.0f}")
-k2.metric("Weighted Value", f"{total_weighted:,.0f}")
-k3.metric("Weighted Profit", f"{total_weighted_profit:,.0f}")
-k4.metric("Avg Likelihood", f"{avg_likelihood:.0f}%")
-k5.metric("Avg Expected Margin", f"{avg_margin:.0f}%")
+with k1:
+    with st.container(border=True):
+        st.metric("Total Pipeline Value", f"{total_pipeline:,.0f}")
+with k2:
+    with st.container(border=True):
+        st.metric("Weighted Value", f"{total_weighted:,.0f}")
+with k3:
+    with st.container(border=True):
+        st.metric("Weighted Profit", f"{total_weighted_profit:,.0f}")
+with k4:
+    with st.container(border=True):
+        st.metric("Avg Likelihood", f"{avg_likelihood:.0f}%")
+with k5:
+    with st.container(border=True):
+        st.metric("Avg Expected Margin", f"{avg_margin:.0f}%")
 
 # ===================================================================
 # PIPELINE VISUALIZATIONS
@@ -214,9 +224,15 @@ if forecast:
     annual_profit = df_forecast["weighted_profit"].sum()
     st.divider()
     c1, c2, c3 = st.columns(3)
-    c1.metric(f"Forecast Revenue ({forecast_year})", f"{annual_revenue:,.0f}")
-    c2.metric(f"Forecast Profit ({forecast_year})", f"{annual_profit:,.0f}")
-    c3.metric("Avg Monthly Revenue", f"{annual_revenue / 12:,.0f}")
+    with c1:
+        with st.container(border=True):
+            st.metric(f"Forecast Revenue ({forecast_year})", f"{annual_revenue:,.0f}")
+    with c2:
+        with st.container(border=True):
+            st.metric(f"Forecast Profit ({forecast_year})", f"{annual_profit:,.0f}")
+    with c3:
+        with st.container(border=True):
+            st.metric("Avg Monthly Revenue", f"{annual_revenue / 12:,.0f}")
 
 # ===================================================================
 # DIRECTOR CAPACITY PLANNING
@@ -288,14 +304,16 @@ domestic_projects = [r for r in rows if r["Exports"] == "No"]
 
 c1, c2 = st.columns(2)
 with c1:
-    exports_value = sum(r["Weighted Value"] for r in exports_projects)
-    st.metric("Exports-Oriented (Weighted)", f"{exports_value:,.0f}")
-    st.caption(f"{len(exports_projects)} project(s)")
+    with st.container(border=True):
+        exports_value = sum(r["Weighted Value"] for r in exports_projects)
+        st.metric("Exports-Oriented (Weighted)", f"{exports_value:,.0f}")
+        st.caption(f"{len(exports_projects)} project(s)")
 
 with c2:
-    domestic_value = sum(r["Weighted Value"] for r in domestic_projects)
-    st.metric("Domestic (Weighted)", f"{domestic_value:,.0f}")
-    st.caption(f"{len(domestic_projects)} project(s)")
+    with st.container(border=True):
+        domestic_value = sum(r["Weighted Value"] for r in domestic_projects)
+        st.metric("Domestic (Weighted)", f"{domestic_value:,.0f}")
+        st.caption(f"{len(domestic_projects)} project(s)")
 
 if exports_projects or domestic_projects:
     fig = px.pie(

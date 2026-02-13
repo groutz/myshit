@@ -124,10 +124,18 @@ pipeline_weighted = sum(
 )
 
 m1, m2, m3, m4 = st.columns(4)
-m1.metric("Total Projects", len(projects))
-m2.metric("Total Contract Value", f"{total_value:,.0f}")
-m3.metric("Active Value", f"{active_value:,.0f}")
-m4.metric("Pipeline (Weighted)", f"{pipeline_weighted:,.0f}")
+with m1:
+    with st.container(border=True):
+        st.metric("Total Projects", len(projects))
+with m2:
+    with st.container(border=True):
+        st.metric("Total Contract Value", f"{total_value:,.0f}")
+with m3:
+    with st.container(border=True):
+        st.metric("Active Value", f"{active_value:,.0f}")
+with m4:
+    with st.container(border=True):
+        st.metric("Pipeline (Weighted)", f"{pipeline_weighted:,.0f}")
 
 # --- Edit Project ---
 st.divider()
