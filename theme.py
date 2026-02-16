@@ -175,11 +175,22 @@ def apply_theme():
         .stApp h1, .stApp h2, .stApp h3, .stApp h4 {{
             color: {theme['text']} !important;
         }}
-        .stApp, .stApp p, .stApp span, .stApp label,
+        .stApp, .stApp p, .stApp label,
         .stApp h1, .stApp h2, .stApp h3, .stApp h4,
         .stApp li, .stApp td, .stApp th, .stApp input,
         .stApp textarea, .stApp select, .stApp button {{
             font-family: {font_stack} !important;
+        }}
+
+        /* ---- Restore Material Symbols icon font ---- */
+        .material-symbols-rounded,
+        .material-symbols-outlined,
+        .material-symbols-sharp,
+        [class*="material-symbols"],
+        [class*="material-icons"] {{
+            font-family: "Material Symbols Rounded", "Material Symbols Outlined", "Material Icons" !important;
+            font-feature-settings: "liga" !important;
+            -webkit-font-feature-settings: "liga" !important;
         }}
 
         /* ---- Links ---- */
