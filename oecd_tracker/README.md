@@ -26,12 +26,25 @@ Then open the URL Streamlit prints (default http://localhost:8501).
 | **Weekly To-Do** | tick / slide this week's + carried-over tasks | **everything** — phase %, milestone %, critical paths, risks |
 | **Phases** | (advanced) edit % / see weights | weighted phase roll-up + overall progress |
 | **Milestones** | edit dates only (% is derived) | Green/Amber/Red/Grey status + days-to-shadow |
-| **Sample** | enter completes per stratum | % of target, booster flags, totals |
+| **Sample** | upload Sakis's daily file (or enter completes) | % of target, booster flags, totals |
 | **Critical Path & Risks** | edit wording/mitigations (status auto) | open-item counts on the Dashboard |
 | **Logs** | weekly reports (Mondays, fieldwork only), daily KPIs, interviewer bench, QA log | running operational record |
 | **Reference** | Team, Buffers, Kickoff Playbook, Project info | standing context |
 | **Project Status** | (read-only) | a client-safe written status note to download/share |
 | **Settings** | dates, targets, today-override, export/import, reset | what-if scenarios + backup |
+
+### Daily sample update (Survey Solutions → Excel → upload)
+
+On the **Sample** page, **Download the template for Sakis** (Αθανάσιος) — a
+pre-filled `.xlsx` with the 26 strata. Each fieldwork day he exports completion
+data (region × urbanity) from Survey Solutions, enters the cumulative
+**Completes** per stratum, and uploads the file. The app previews the changes
+(old → new per stratum) before you **Apply**. The parser accepts either the
+per-stratum template (matched by ID) or a raw per-interview export (one
+completed interview per row, with Region + Urban/Rural columns), which it counts
+per stratum automatically. A tracked task (`P4-7`, owner Αθανάσιος) covers this
+daily delivery during fieldwork. A ready copy of the template lives in
+[`templates/`](templates/).
 
 ### The task model (how "report one thing, the rest fills in" works)
 

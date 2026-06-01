@@ -1,4 +1,5 @@
-"""Sample tracker — 26 strata. Enter completes → % of target + booster flags."""
+"""Sample tracker — 26 strata. Daily Excel upload from Survey Solutions, or
+enter completes → % of target + booster flags."""
 
 from __future__ import annotations
 
@@ -6,6 +7,7 @@ import pandas as pd
 import streamlit as st
 
 import logic
+import sample_io
 from store import get_state, save_state
 from ui import page_header, saved_toast, setup
 
@@ -13,8 +15,8 @@ setup("Sample", "📞")
 state = get_state()
 cfg = state.get("settings", {})
 page_header("Sample tracker — 26 strata (NUTS-2 × Urban/Rural)",
-            f"Enter completes/refusals/calls per stratum. % of target and the "
-            f"booster flag update live. Booster fires when a stratum is under "
+            f"Update daily by uploading Sakis's Survey Solutions file, or edit "
+            f"the table directly. Booster fires when a stratum is under "
             f"{cfg.get('booster_threshold_pct', 70)}% AND today ≥ "
             f"{cfg.get('booster_decision_date', '')}.")
 
@@ -27,6 +29,53 @@ c4.metric("Strata under target", t["under"])
 c5.metric("Boosters triggered", t["boosters"])
 st.progress(min(t["pct"] / 100, 1.0))
 st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
+
+# ---------------------------------------------------- daily upload workflow
+st.markdown("#### 📤 Daily update — upload Sakis's Survey Solutions file")
+dl, up = st.columns([1, 2])
+with dl:
+    st.download_button(
+        "⬇️ Template for Sakis (.xlsx)", data=sample_io.build_template(state),
+        file_name="Sample_Daily_Update_Template.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        help="Pre-filled with the 26 strata. Sakis fills cumulative completes "
+             "and uploads it back here.")
+with up:
+    uploaded = st.file_uploader("Upload the daily file (.xlsx or .csv)",
+                                type=["xlsx", "xls", "csv"], key="sample_upload")
+
+if uploaded is not None:
+    try:
+        result = sample_io.parse_upload(uploaded, state)
+    except Exception as exc:  # surface a friendly message rather than a trace
+        st.error(f"Couldn't read that file: {exc}")
+    else:
+        st.caption(f"Detected format: **{result['mode']}** · "
+                   f"{len(result['updates'])} strata in file")
+        if result["warnings"]:
+            with st.expander(f"⚠️ {len(result['warnings'])} row(s) not matched"):
+                for w in result["warnings"]:
+                    st.write("- " + w)
+        prev = pd.DataFrame([{
+            "Region": u["region"], "Urban/Rural": u["type"],
+            "Completes (now)": u["old_completes"],
+            "Completes (new)": u["new_completes"],
+            "Δ": u["new_completes"] - u["old_completes"],
+        } for u in result["updates"]])
+        changed = prev[prev["Δ"] != 0]
+        st.markdown(f"**Preview** — {len(changed)} strata change. "
+                    f"New total completes: "
+                    f"**{sum(u['new_completes'] for u in result['updates'])}**")
+        st.dataframe(changed if not changed.empty else prev,
+                     hide_index=True, use_container_width=True)
+        if st.button("✅ Apply this update", type="primary"):
+            sample_io.apply_updates(state, result["updates"])
+            save_state()
+            saved_toast()
+            st.rerun()
+
+st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
+st.markdown("#### Or edit the table directly")
 
 rows = logic.sample_rows(state)
 df = pd.DataFrame([{

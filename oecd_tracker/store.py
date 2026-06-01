@@ -172,6 +172,16 @@ def _migrate(state: dict) -> dict:
     if "weekly_reports" not in state:
         state["weekly_reports"] = seed.get("weekly_reports", [])
         state.pop("friday_reports", None)
+
+    # ensure newly-added seed sub-tasks (e.g. Sakis's daily sample upload) land
+    # in existing state, matched by phase + sub-task id.
+    state_subs = {(p["id"], s.get("id"))
+                  for p in state.get("phases", []) for s in p.get("subtasks", [])}
+    state_phases = {p["id"]: p for p in state.get("phases", [])}
+    for sp in seed.get("phases", []):
+        for ss in sp.get("subtasks", []):
+            if (sp["id"], ss.get("id")) not in state_subs and sp["id"] in state_phases:
+                state_phases[sp["id"]]["subtasks"].append(dict(ss))
     return state
 
 
