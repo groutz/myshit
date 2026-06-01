@@ -1,0 +1,2741 @@
+{
+  "meta": {
+    "Project": "OECD/INFE International Survey of Adult Financial Literacy, Inclusion and Well-Being 2026 — Greece",
+    "Contracting Authority": "Υπουργείο Εθνικής Οικονομίας και Οικονομικών — Γενική Γραμματεία Χρηματοπιστωτικού Τομέα",
+    "Contractor": "Κάπα Research – Consulting ΑΕ (Subcontractor: Κων. Σ. Ρουτζούνης ΑΕ)",
+    "PM": "Γεράσιμος Ρουτζούνης",
+    "Assignment date (official)": "14 May 2026 — the clock starts here, NOT at kick-off.",
+    "Kick-off meeting": "26 May 2026 · 13:30 (Ministry + BoG + HCMC)",
+    "Final delivery (contract)": "29 Oct 2026 — Week 24 from assignment",
+    "Final delivery (shadow)": "19 Oct 2026",
+    "Sample target (n)": "≥ 1,000 completes, 26 strata represented",
+    "Classification": "INTERNAL — Do not share Shadow dates, Risk Watchlist, or Buffers section.",
+    "Sheets in this workbook": "Settings · Dashboard · Milestones · ThisWeek · Phases · KickoffPlaybook · CriticalPath · Risks · Team · Buffers · FridayReports · Sample · FieldworkDaily · Interviewers · QA_Log",
+    "Status colour code": "Green = on track / done · Amber = at risk / in progress · Red = blocked / slipping · Grey = not started",
+    "How dates work": "Contract dates are externally-committed and fixed. Shadow dates are 7–10 days earlier — internal triggers. Slipping past Shadow is the early-warning. Pre-kick-off prep window runs from assignment (14 May) — NOT from kick-off.",
+    "Source of truth": "This file is the master. The HTML dashboard reads from this file."
+  },
+  "settings": {
+    "today_override": null,
+    "assignment_date": "2026-05-14",
+    "kickoff": "2026-05-26",
+    "final_contract": "2026-10-29",
+    "final_shadow": "2026-10-19",
+    "sample_target": 1000,
+    "qa_target_pct": 12.5,
+    "booster_decision_date": "2026-07-22",
+    "booster_threshold_pct": 70,
+    "friday_deadline": "14:00 Athens"
+  },
+  "milestones": [
+    {
+      "id": 1,
+      "name": "PMQP + Questionnaire (Week 2)",
+      "contract": "2026-05-28",
+      "shadow": "2026-05-21",
+      "pct": 0,
+      "why": "One full week for Ministry review games"
+    },
+    {
+      "id": 2,
+      "name": "Training complete (Week 4)",
+      "contract": "2026-06-11",
+      "shadow": "2026-06-04",
+      "pct": 0,
+      "why": "Need pilot-ready interviewers, not 'trained' interviewers"
+    },
+    {
+      "id": 3,
+      "name": "Pilot complete (Week 6)",
+      "contract": "2026-06-25",
+      "shadow": "2026-06-18",
+      "pct": 0,
+      "why": "Script changes after pilot eat 3 days"
+    },
+    {
+      "id": 4,
+      "name": "Main fieldwork done (Week 9)",
+      "contract": "2026-07-16",
+      "shadow": "2026-07-12",
+      "pct": 0,
+      "why": "Last 4 days for stratum top-up"
+    },
+    {
+      "id": 5,
+      "name": "Final files (Week 14)",
+      "contract": "2026-08-20",
+      "shadow": "2026-08-13",
+      "pct": 0,
+      "why": "August vacations don't get to derail us"
+    },
+    {
+      "id": 6,
+      "name": "Scoring + report (Week 24)",
+      "contract": "2026-10-29",
+      "shadow": "2026-10-19",
+      "pct": 0,
+      "why": "10 weeks for analysis, report and presentation"
+    }
+  ],
+  "this_week": [
+    {
+      "id": 1,
+      "action": "Read Greek OECD questionnaire end-to-end. Mark adaptations for TEKE, IRIS, digital wallets, current Greek banking landscape.",
+      "owner": "PM",
+      "due": "2026-05-22",
+      "done": false,
+      "notes": ""
+    },
+    {
+      "id": 2,
+      "action": "Email external sampling consultant — (a) one-pager by 1 Jun, (b) weights by 15 Aug, (c) join the kickoff call.",
+      "owner": "PM",
+      "due": "2026-05-22",
+      "done": true,
+      "notes": ""
+    },
+    {
+      "id": 3,
+      "action": "Pull 2022 OECD/INFE fieldwork files: missed strata, refusal patterns, mean interview length, refusal-conversion scripts.",
+      "owner": "PM",
+      "due": "2026-05-22",
+      "done": false,
+      "notes": ""
+    },
+    {
+      "id": 4,
+      "action": "Confirm interviewer bench for July — names, dates, vacation conflicts. Written confirmation, not Slack.",
+      "owner": "PM / Έλλη",
+      "due": "2026-05-23",
+      "done": true,
+      "notes": ""
+    },
+    {
+      "id": 5,
+      "action": "Draft 70% of PMQP using proposal as the base. Focus time on architecture diagram + QC flowchart.",
+      "owner": "PM",
+      "due": "2026-05-23",
+      "done": false,
+      "notes": ""
+    },
+    {
+      "id": 6,
+      "action": "IT/Tech: confirm VICIdial capacity, server, encryption status, audit log retention.",
+      "owner": "Αθανάσιος",
+      "due": "2026-05-23",
+      "done": true,
+      "notes": ""
+    },
+    {
+      "id": 7,
+      "action": "Send Ministry pre-read (one page): project parameters, governance, RACI, asks. Sets the frame.",
+      "owner": "PM",
+      "due": "2026-05-25",
+      "done": true,
+      "notes": ""
+    },
+    {
+      "id": 8,
+      "action": "Block Αθανάσιος's August leave to ≤ 5 days. Non-negotiable. Do this now while it's polite.",
+      "owner": "PM",
+      "due": "2026-05-22",
+      "done": true,
+      "notes": ""
+    }
+  ],
+  "phases": [
+    {
+      "id": "P1",
+      "name": "Design & Setup",
+      "window": "Weeks 0–2 (14 May – 28 May)",
+      "subtasks": [
+        {
+          "task": "PMQP — 80% reuse from proposal. Architecture diagram + QC flowchart are what they read.",
+          "owner": "PM",
+          "pct": 0,
+          "notes": "",
+          "id": "P1-1"
+        },
+        {
+          "task": "Questionnaire adaptation — financial-product naming only (TEKE / IRIS / wallets / Greek credit). DO NOT touch OECD core items.",
+          "owner": "PM + Αθανάσιος",
+          "pct": 0,
+          "notes": "OECD Secretariat will catch core-item changes.",
+          "id": "P1-2"
+        },
+        {
+          "task": "Submit two questionnaire versions (minimal + fuller adaptation). Ministry picks.",
+          "owner": "PM",
+          "pct": 0,
+          "notes": "Gives them ownership; avoids the 'why did you change this' loop.",
+          "id": "P1-3"
+        },
+        {
+          "task": "Sampling plan — confirm RDD frame currency (mobile penetration shifted since 2022).",
+          "owner": "Sampling consultant",
+          "pct": 0,
+          "notes": "Flag landline-share drift internally, not to Ministry unless it matters.",
+          "id": "P1-4"
+        },
+        {
+          "task": "Defensive scripting on OECD core-item routing — don't wait for pilot to find bugs.",
+          "owner": "Αθανάσιος",
+          "pct": 0,
+          "notes": "",
+          "id": "P1-5"
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "name": "Training",
+      "window": "Weeks 2–4 (28 May – 11 Jun)",
+      "subtasks": [
+        {
+          "task": "Start recruiting Day 1. 'Training complete 23 Jun' = recruit week 1, induction-brief week 2, formal training week 3.",
+          "owner": "Έλλη",
+          "pct": 0,
+          "notes": "",
+          "id": "P2-1"
+        },
+        {
+          "task": "Two smaller briefings (morning shift + evening shift). Beats one big one for attention quality.",
+          "owner": "Έλλη",
+          "pct": 0,
+          "notes": "",
+          "id": "P2-2"
+        },
+        {
+          "task": "Ministry attends first 30 min of briefing only. Then they leave — don't let them sit through role-play.",
+          "owner": "PM",
+          "pct": 0,
+          "notes": "",
+          "id": "P2-3"
+        },
+        {
+          "task": "Use 2022 wave material as warm-up. Half the bench has done this before.",
+          "owner": "Έλλη",
+          "pct": 0,
+          "notes": "",
+          "id": "P2-4"
+        },
+        {
+          "task": "Per-interviewer sign-off is QA's call, not Field Director's. Independence matters when something goes wrong.",
+          "owner": "Ευγενία",
+          "pct": 0,
+          "notes": "",
+          "id": "P2-5"
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "name": "Pilot",
+      "window": "Weeks 4–6 (11 Jun – 25 Jun)",
+      "subtasks": [
+        {
+          "task": "Aim for 150 over 4–5 days (officially 100). Better power; extras feed into final n.",
+          "owner": "Έλλη",
+          "pct": 0,
+          "notes": "",
+          "id": "P3-1"
+        },
+        {
+          "task": "QA monitors live → pilot report writes itself. Don't make it a project.",
+          "owner": "Ευγενία",
+          "pct": 0,
+          "notes": "",
+          "id": "P3-2"
+        },
+        {
+          "task": "Pre-decision rule: non-core script changes OK; core-item changes require PM + Data Director sign-off and a methodological deviation note.",
+          "owner": "PM + Αθανάσιος",
+          "pct": 0,
+          "notes": "Most pilot 'issues' are interviewer issues, not script issues.",
+          "id": "P3-3"
+        },
+        {
+          "task": "Confirm soft-launch into main fieldwork (gives 4–5 extra interviewing days).",
+          "owner": "PM",
+          "pct": 0,
+          "notes": "Minuted at kickoff.",
+          "id": "P3-4"
+        }
+      ]
+    },
+    {
+      "id": "P4",
+      "name": "Main Fieldwork",
+      "window": "Weeks 6–9 (25 Jun – 16 Jul)",
+      "subtasks": [
+        {
+          "task": "Daily KPI dashboard internally. Weekly KPI report to Ministry. Never confuse the two.",
+          "owner": "Αλέξης",
+          "pct": 0,
+          "notes": "",
+          "id": "P4-1"
+        },
+        {
+          "task": "Friday report style: tight, factual, forward-looking. Never 'concerned about…' or 'may not make…'",
+          "owner": "PM",
+          "pct": 0,
+          "notes": "",
+          "id": "P4-2"
+        },
+        {
+          "task": "Mid-July: pre-plan a Saturday push and a midweek evening blitz. Vacation peak.",
+          "owner": "Έλλη",
+          "pct": 0,
+          "notes": "",
+          "id": "P4-3"
+        },
+        {
+          "task": "QA verification 12–15% (10% floor). Findings must be unimpeachable.",
+          "owner": "Ευγενία",
+          "pct": 0,
+          "notes": "",
+          "id": "P4-4"
+        },
+        {
+          "task": "Front-load calling for small strata (Ionian, Voreio + Notio Aigaio) from Day 1, not from week 2.",
+          "owner": "Έλλη",
+          "pct": 0,
+          "notes": "",
+          "id": "P4-5"
+        },
+        {
+          "task": "Booster decision point: 22 Jul. Any stratum <70% → trigger booster, don't wait until week 3.",
+          "owner": "PM + Έλλη",
+          "pct": 0,
+          "notes": "",
+          "id": "P4-6"
+        }
+      ]
+    },
+    {
+      "id": "P5",
+      "name": "Data Processing",
+      "window": "Weeks 9–14 (16 Jul – 20 Aug)",
+      "subtasks": [
+        {
+          "task": "Strict sequencing: cleaning → weighting → OECD template build → QC. No parallel work on dependent tasks.",
+          "owner": "Αθανάσιος",
+          "pct": 0,
+          "notes": "",
+          "id": "P5-1"
+        },
+        {
+          "task": "Sampling consultant delivers weights by 15 Aug. Chase weekly.",
+          "owner": "Sampling consultant",
+          "pct": 0,
+          "notes": "Confirmed in writing in P1.",
+          "id": "P5-2"
+        },
+        {
+          "task": "Build to OECD template from CATI script outwards. Retrofit at the end loses 5 days.",
+          "owner": "Αθανάσιος",
+          "pct": 0,
+          "notes": "",
+          "id": "P5-3"
+        },
+        {
+          "task": "Internal QC pass before anything goes to Ministry. QA Director signs final file in writing.",
+          "owner": "Ευγενία",
+          "pct": 0,
+          "notes": "",
+          "id": "P5-4"
+        }
+      ]
+    },
+    {
+      "id": "P6",
+      "name": "Scoring & Report",
+      "window": "Weeks 14–24 (20 Aug – 29 Oct)",
+      "subtasks": [
+        {
+          "task": "Preliminary national report ~25 pages. Not a thesis.",
+          "owner": "PM + Αθανάσιος",
+          "pct": 0,
+          "notes": "",
+          "id": "P6-1"
+        },
+        {
+          "task": "Cross-sectional cuts: age, gender, education, region, income. That's it.",
+          "owner": "Αθανάσιος",
+          "pct": 0,
+          "notes": "",
+          "id": "P6-2"
+        },
+        {
+          "task": "Build the late-Oct Ministry presentation deck WHILE writing the report. Reuse charts.",
+          "owner": "PM",
+          "pct": 0,
+          "notes": "",
+          "id": "P6-3"
+        },
+        {
+          "task": "Lead with 2022 → 2026 comparability story. That's what makes this report useful.",
+          "owner": "PM",
+          "pct": 0,
+          "notes": "",
+          "id": "P6-4"
+        }
+      ]
+    }
+  ],
+  "critical_path": [
+    {
+      "id": 1,
+      "item": "Greek questionnaire sign-off",
+      "why": "Ministry + BoG + HCMC each have opinions. Organic review loses 2 weeks. Force a single consolidated review with hard 5-day SLA on Day 1, minuted.",
+      "owner": "PM",
+      "status": "Not started",
+      "last_reviewed": ""
+    },
+    {
+      "id": 2,
+      "item": "Interviewer availability in July",
+      "why": "Greek summer + CATI shift schedule = real bottleneck. Losing 5 good interviewers to vacations kills fieldwork. Lock the bench in writing this week.",
+      "owner": "Έλλη",
+      "status": "Not started",
+      "last_reviewed": ""
+    },
+    {
+      "id": 3,
+      "item": "CATI script stability post-pilot",
+      "why": "Filter/routing bugs on OECD core items go straight to Αθανάσιος (most stretched role). Defensive checks in P1; don't wait for pilot to find them.",
+      "owner": "Αθανάσιος",
+      "status": "Not started",
+      "last_reviewed": ""
+    },
+    {
+      "id": 4,
+      "item": "Small-stratum fill",
+      "why": "Ionian, Voreio Aigaio, Notio Aigaio will fall behind. Over-allocate calling load from Day 1, not week 2 when we notice.",
+      "owner": "Έλλη",
+      "status": "Not started",
+      "last_reviewed": ""
+    }
+  ],
+  "risks": [
+    {
+      "id": 1,
+      "risk": "Ministry slow-walks questionnaire sign-off",
+      "mitigation": "Submit minimal-adaptation version first; force the SLA at kickoff.",
+      "owner": "PM",
+      "likelihood": "High",
+      "impact": "High",
+      "status": "Open",
+      "last_updated": ""
+    },
+    {
+      "id": 2,
+      "risk": "BoG or HCMC adds questions late",
+      "mitigation": "Establish single-Ministry-voice rule at kickoff; document it.",
+      "owner": "PM",
+      "likelihood": "High",
+      "impact": "Medium",
+      "status": "Open",
+      "last_updated": ""
+    },
+    {
+      "id": 3,
+      "risk": "Interviewer pool collapses in July",
+      "mitigation": "Retainer + subcontractor backstop locked this week.",
+      "owner": "PM / Έλλη",
+      "likelihood": "Medium",
+      "impact": "High",
+      "status": "Open",
+      "last_updated": ""
+    },
+    {
+      "id": 4,
+      "risk": "Pilot reveals OECD core-item routing bug",
+      "mitigation": "Defensive scripting in P1; pre-decision rule for post-pilot changes.",
+      "owner": "Αθανάσιος",
+      "likelihood": "Medium",
+      "impact": "High",
+      "status": "Open",
+      "last_updated": ""
+    },
+    {
+      "id": 5,
+      "risk": "Small NUTS-2 strata under target",
+      "mitigation": "Front-load calling there from day 1 of fieldwork.",
+      "owner": "Έλλη",
+      "likelihood": "High",
+      "impact": "Medium",
+      "status": "Open",
+      "last_updated": ""
+    },
+    {
+      "id": 6,
+      "risk": "Αθανάσιος overloaded → bottleneck in P5",
+      "mitigation": "Protected August leave; backup Data Analyst identified now.",
+      "owner": "PM",
+      "likelihood": "Medium",
+      "impact": "High",
+      "status": "Open",
+      "last_updated": ""
+    },
+    {
+      "id": 7,
+      "risk": "August vacation drift → Sep delivery slips",
+      "mitigation": "Hard internal date of 28 Aug; staggered leave with PM approval only.",
+      "owner": "PM",
+      "likelihood": "Medium",
+      "impact": "High",
+      "status": "Open",
+      "last_updated": ""
+    },
+    {
+      "id": 8,
+      "risk": "Ministry wants preliminary results before fieldwork ends",
+      "mitigation": "Hard no; blame OECD/INFE protocol if pushed.",
+      "owner": "PM",
+      "likelihood": "Medium",
+      "impact": "Low",
+      "status": "Open",
+      "last_updated": ""
+    },
+    {
+      "id": 9,
+      "risk": "OECD Secretariat changes template format mid-project",
+      "mitigation": "Watch INFE communications weekly; Αθανάσιος owns this watch.",
+      "owner": "Αθανάσιος",
+      "likelihood": "Low",
+      "impact": "High",
+      "status": "Open",
+      "last_updated": ""
+    },
+    {
+      "id": 10,
+      "risk": "Subcontractor coordination friction",
+      "mitigation": "Weekly check-in; same family but pretend it's arms-length.",
+      "owner": "PM",
+      "likelihood": "Low",
+      "impact": "Medium",
+      "status": "Open",
+      "last_updated": ""
+    }
+  ],
+  "sample": [
+    {
+      "id": 1,
+      "region": "Αττική",
+      "type": "Αστικά",
+      "target": 342,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 2,
+      "region": "Αττική",
+      "type": "Αγροτικά/Ημιαστικά",
+      "target": 10,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 3,
+      "region": "Κεντρική Μακεδονία",
+      "type": "Αστικά",
+      "target": 144,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 4,
+      "region": "Κεντρική Μακεδονία",
+      "type": "Αγροτικά/Ημιαστικά",
+      "target": 32,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 5,
+      "region": "Θεσσαλία",
+      "type": "Αστικά",
+      "target": 48,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 6,
+      "region": "Θεσσαλία",
+      "type": "Αγροτικά/Ημιαστικά",
+      "target": 22,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 7,
+      "region": "Δυτική Ελλάδα",
+      "type": "Αστικά",
+      "target": 39,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 8,
+      "region": "Δυτική Ελλάδα",
+      "type": "Αγροτικά/Ημιαστικά",
+      "target": 21,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 9,
+      "region": "Κρήτη",
+      "type": "Αστικά",
+      "target": 36,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 10,
+      "region": "Κρήτη",
+      "type": "Αγροτικά/Ημιαστικά",
+      "target": 24,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 11,
+      "region": "Ανατολική Μακεδονία και Θράκη",
+      "type": "Αστικά",
+      "target": 33,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 12,
+      "region": "Ανατολική Μακεδονία και Θράκη",
+      "type": "Αγροτικά/Ημιαστικά",
+      "target": 22,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 13,
+      "region": "Στερεά Ελλάδα",
+      "type": "Αστικά",
+      "target": 28,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 14,
+      "region": "Στερεά Ελλάδα",
+      "type": "Αγροτικά/Ημιαστικά",
+      "target": 22,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 15,
+      "region": "Πελοπόννησος",
+      "type": "Αστικά",
+      "target": 25,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 16,
+      "region": "Πελοπόννησος",
+      "type": "Αγροτικά/Ημιαστικά",
+      "target": 25,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 17,
+      "region": "Ήπειρος",
+      "type": "Αστικά",
+      "target": 16,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 18,
+      "region": "Ήπειρος",
+      "type": "Αγροτικά/Ημιαστικά",
+      "target": 13,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 19,
+      "region": "Νότιο Αιγαίο",
+      "type": "Αστικά",
+      "target": 18,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 20,
+      "region": "Νότιο Αιγαίο",
+      "type": "Αγροτικά/Ημιαστικά",
+      "target": 12,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 21,
+      "region": "Δυτική Μακεδονία",
+      "type": "Αστικά",
+      "target": 16,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 22,
+      "region": "Δυτική Μακεδονία",
+      "type": "Αγροτικά/Ημιαστικά",
+      "target": 10,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 23,
+      "region": "Βόρειο Αιγαίο",
+      "type": "Αστικά",
+      "target": 14,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 24,
+      "region": "Βόρειο Αιγαίο",
+      "type": "Αγροτικά/Ημιαστικά",
+      "target": 11,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 25,
+      "region": "Ιόνια Νησιά",
+      "type": "Αστικά",
+      "target": 14,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    },
+    {
+      "id": 26,
+      "region": "Ιόνια Νησιά",
+      "type": "Αγροτικά/Ημιαστικά",
+      "target": 11,
+      "completes": 0,
+      "refusals": 0,
+      "calls": 0
+    }
+  ],
+  "team": [
+    {
+      "person": "Αλέξης",
+      "role": "Exec Director",
+      "read": "Strong on ops, knows 2022, family — trust him.",
+      "need": "Daily ownership of fieldwork; KPI tracking; proxy in Ministry meetings when I'm not there.",
+      "give": "Authority. Don't undercut him in front of the team.",
+      "backup": "—"
+    },
+    {
+      "person": "Έλλη",
+      "role": "Field Director",
+      "read": "Experienced, stretched across other projects.",
+      "need": "100% commitment in July, no other projects competing.",
+      "give": "Backup Field Coordinator in case she's pulled.",
+      "backup": "Subcontractor team"
+    },
+    {
+      "person": "Αθανάσιος",
+      "role": "Data Director",
+      "read": "The technical-risk owner. Most likely single point of failure.",
+      "need": "Honesty when he's blocked or stretched. If he says 'we have a problem', I act.",
+      "give": "Protected August. Backup Data Analyst on standby. No surprise scope additions.",
+      "backup": "Backup Data Analyst"
+    },
+    {
+      "person": "Ευγενία",
+      "role": "QA Director",
+      "read": "Must be independent of A and B.",
+      "need": "Real findings, even uncomfortable ones.",
+      "give": "Cover when she flags something the team doesn't want to hear. If I override her, it's a red flag.",
+      "backup": "—"
+    },
+    {
+      "person": "Sampling consultant",
+      "role": "External",
+      "read": "External, slow, but essential.",
+      "need": "Sampling plan by 1 Jun; weights by 15 Aug. In writing.",
+      "give": "Direct line to me; quick decisions when needed.",
+      "backup": "—"
+    },
+    {
+      "person": "Ελευθέριος",
+      "role": "Finance",
+      "read": "Keep informed, not in ops loop.",
+      "need": "Clean invoicing; subcontractor payments on time.",
+      "give": "Visibility on milestones so cashflow tracks.",
+      "backup": "—"
+    },
+    {
+      "person": "Αναστάσιος Γεωργιάδης",
+      "role": "Veteran / Advisor",
+      "read": "Veteran, seen it all, low-ego.",
+      "need": "Sounding board on tricky calls; quiet review of major decisions.",
+      "give": "Respect for his experience; don't waste his time on minor stuff.",
+      "backup": "—"
+    },
+    {
+      "person": "Ρουτζούνης ΑΕ",
+      "role": "Subcontractor",
+      "read": "Family relationship — easier coordination but no formal slack.",
+      "need": "Resource backstop when interviewer pool stretches.",
+      "give": "Clear scope and clean payment.",
+      "backup": "—"
+    }
+  ],
+  "buffers": [
+    {
+      "category": "Flexible",
+      "item": "The 7–10 day internal buffer per milestone (that's why it's there)",
+      "status": "Available",
+      "notes": ""
+    },
+    {
+      "category": "Flexible",
+      "item": "Depth of cross-sectional analysis in the preliminary report (keep it preliminary)",
+      "status": "Available",
+      "notes": ""
+    },
+    {
+      "category": "Flexible",
+      "item": "Optional methodological report's exhaustiveness",
+      "status": "Available",
+      "notes": ""
+    },
+    {
+      "category": "Flexible",
+      "item": "Interviewer over-recruitment (cheaper to release than to scramble)",
+      "status": "Available",
+      "notes": ""
+    },
+    {
+      "category": "Protected",
+      "item": "≥1,000 completed interviews",
+      "status": "Intact",
+      "notes": ""
+    },
+    {
+      "category": "Protected",
+      "item": "26 strata represented (even if some are thin)",
+      "status": "Intact",
+      "notes": ""
+    },
+    {
+      "category": "Protected",
+      "item": "OECD/INFE data template compliance",
+      "status": "Intact",
+      "notes": ""
+    },
+    {
+      "category": "Protected",
+      "item": "GDPR compliance — zero incidents",
+      "status": "Intact",
+      "notes": ""
+    },
+    {
+      "category": "Protected",
+      "item": "End-of-October deadline (Ministry needs OECD platform upload — slipping kills 2030 prospects)",
+      "status": "Intact",
+      "notes": ""
+    }
+  ],
+  "kickoff_playbook": [
+    {
+      "category": "Push for (and minute it)",
+      "item": "Single Ministry point of contact for questionnaire decisions.",
+      "outcome": "Ok",
+      "minuted": true,
+      "notes": ""
+    },
+    {
+      "category": "Push for (and minute it)",
+      "item": "5-working-day SLA on Ministry reviews of any deliverable we submit.",
+      "outcome": "Ok",
+      "minuted": true,
+      "notes": ""
+    },
+    {
+      "category": "Push for (and minute it)",
+      "item": "Written ack that mid-fieldwork questionnaire changes are out of scope.",
+      "outcome": "Ok",
+      "minuted": true,
+      "notes": ""
+    },
+    {
+      "category": "Push for (and minute it)",
+      "item": "Verbal ack (minuted) that pilot can soft-launch into main fieldwork — 4–5 extra interviewing days.",
+      "outcome": "Ok",
+      "minuted": true,
+      "notes": ""
+    },
+    {
+      "category": "Push for (and minute it)",
+      "item": "BoG and HCMC inputs route through Ministry, not directly to us.",
+      "outcome": "Ok",
+      "minuted": true,
+      "notes": ""
+    },
+    {
+      "category": "Hold back",
+      "item": "Shadow dates. Ever. Including under polite pressure.",
+      "outcome": "Ok",
+      "minuted": true,
+      "notes": ""
+    },
+    {
+      "category": "Hold back",
+      "item": "Any concern without a mitigation. No problems-without-solutions on Day 1.",
+      "outcome": "Ok",
+      "minuted": true,
+      "notes": ""
+    },
+    {
+      "category": "Hold back",
+      "item": "Internal team allocations, subcontractor details. Stay high-level.",
+      "outcome": "Ok",
+      "minuted": true,
+      "notes": ""
+    },
+    {
+      "category": "Don't volunteer",
+      "item": "Extra analyses, extra cuts, extra languages — all out of scope.",
+      "outcome": "Ok",
+      "minuted": true,
+      "notes": ""
+    },
+    {
+      "category": "Don't volunteer",
+      "item": "Specific response-rate targets beyond ≥1,000 completes.",
+      "outcome": "Ok",
+      "minuted": true,
+      "notes": ""
+    },
+    {
+      "category": "Don't volunteer",
+      "item": "Methodological debates. Refer to OECD/INFE Toolkit 2026.",
+      "outcome": "Ok",
+      "minuted": true,
+      "notes": ""
+    },
+    {
+      "category": "Watch for",
+      "item": "BoG/HCMC pushing extra questions → smile, defer to Ministry, do not commit.",
+      "outcome": "Ok",
+      "minuted": true,
+      "notes": ""
+    },
+    {
+      "category": "Watch for",
+      "item": "Anyone asking about preliminary results before fieldwork ends. Hard no.",
+      "outcome": "Ok",
+      "minuted": true,
+      "notes": ""
+    },
+    {
+      "category": "Watch for",
+      "item": "Vague 'let's discuss as we go' language. Get specificity now or pay later.",
+      "outcome": "Ok",
+      "minuted": true,
+      "notes": ""
+    }
+  ],
+  "friday_reports": [
+    {
+      "date": "2026-05-29",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-06-05",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-06-12",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-06-19",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-06-26",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-07-03",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-07-10",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-07-17",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-07-24",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-07-31",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-08-07",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-08-14",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-08-21",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-08-28",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-09-04",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-09-11",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-09-18",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-09-25",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-10-02",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-10-09",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-10-16",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-10-23",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-10-30",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    }
+  ],
+  "fieldwork_daily": [
+    {
+      "date": "2026-06-22",
+      "day": "Mon",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-06-23",
+      "day": "Tue",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-06-24",
+      "day": "Wed",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-06-25",
+      "day": "Thu",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-06-26",
+      "day": "Fri",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-06-27",
+      "day": "Sat",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-06-29",
+      "day": "Mon",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-06-30",
+      "day": "Tue",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-07-01",
+      "day": "Wed",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-07-02",
+      "day": "Thu",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-07-03",
+      "day": "Fri",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-07-04",
+      "day": "Sat",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-07-06",
+      "day": "Mon",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-07-07",
+      "day": "Tue",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-07-08",
+      "day": "Wed",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-07-09",
+      "day": "Thu",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-07-10",
+      "day": "Fri",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-07-11",
+      "day": "Sat",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-07-13",
+      "day": "Mon",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-07-14",
+      "day": "Tue",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-07-15",
+      "day": "Wed",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    },
+    {
+      "date": "2026-07-16",
+      "day": "Thu",
+      "new_completes": 0,
+      "cum_completes": 0,
+      "calls": 0,
+      "coop_rate": 0.0,
+      "refusal_rate": 0.0,
+      "mean_len": 0.0,
+      "qa_pct": 0.0
+    }
+  ],
+  "interviewers": [
+    {
+      "id": 1,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 2,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 3,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 4,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 5,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 6,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 7,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 8,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 9,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 10,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 11,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 12,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 13,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 14,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 15,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 16,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 17,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 18,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 19,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 20,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 21,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 22,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 23,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 24,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 25,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 26,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 27,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 28,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 29,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    },
+    {
+      "id": 30,
+      "name": "",
+      "confirmed": false,
+      "conflicts": "",
+      "retainer": false,
+      "shift": "",
+      "notes": ""
+    }
+  ],
+  "qa_log": [
+    {
+      "id": 1,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 2,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 3,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 4,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 5,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 6,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 7,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 8,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 9,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 10,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 11,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 12,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 13,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 14,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 15,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 16,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 17,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 18,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 19,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 20,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 21,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 22,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 23,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 24,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 25,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 26,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 27,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 28,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 29,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 30,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 31,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 32,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 33,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 34,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 35,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 36,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 37,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 38,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 39,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 40,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 41,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 42,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 43,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 44,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 45,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 46,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 47,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 48,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 49,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 50,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 51,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 52,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 53,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 54,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 55,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 56,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 57,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 58,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 59,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 60,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 61,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 62,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 63,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 64,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 65,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 66,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 67,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 68,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 69,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 70,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 71,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 72,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 73,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 74,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 75,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 76,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 77,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 78,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 79,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 80,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 81,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 82,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 83,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 84,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 85,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 86,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 87,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 88,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 89,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 90,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 91,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 92,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 93,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 94,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 95,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 96,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 97,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 98,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 99,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 100,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 101,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 102,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 103,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 104,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 105,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 106,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 107,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 108,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 109,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 110,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 111,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 112,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 113,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 114,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 115,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 116,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 117,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 118,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 119,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    },
+    {
+      "id": 120,
+      "date": "",
+      "interview_id": "",
+      "verifier": "",
+      "result": "",
+      "issue_type": "",
+      "notes": ""
+    }
+  ]
+}
