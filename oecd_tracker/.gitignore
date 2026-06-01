@@ -1,0 +1,8 @@
+# Live working state — generated on first run, seeded from seed_data.json.
+# Keep it local so the repo always carries the clean Excel-derived baseline.
+state.json
+__pycache__/
+*.pyc
+
+# Real secrets must never be committed (only the .example template is tracked).
+.streamlit/secrets.toml
