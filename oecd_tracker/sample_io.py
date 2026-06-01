@@ -34,6 +34,14 @@ REGION_CODES = {
     "πελοποννησος": "EL65",
 }
 
+# Survey Solutions numbers the 13 regions 1-13 in NUTS-2 code order.
+REGION_NUM = {
+    1: "αττικη", 2: "βορειο αιγαιο", 3: "νοτιο αιγαιο", 4: "κρητη",
+    5: "ανατολικη μακεδονια και θρακη", 6: "κεντρικη μακεδονια",
+    7: "δυτικη μακεδονια", 8: "ηπειρος", 9: "θεσσαλια", 10: "ιονια νησια",
+    11: "δυτικη ελλαδα", 12: "στερεα ελλαδα", 13: "πελοποννησος",
+}
+
 
 # --------------------------------------------------------------- normalising
 def _norm(s) -> str:
@@ -61,8 +69,9 @@ def _is_complete(value) -> bool:
 
 
 def _lookups(state: dict):
-    """id->row, (region_name,type)->row, (region_code,type)->row."""
-    by_id, by_rt, by_code = {}, {}, {}
+    """id->row, plus (region,type)->row keyed by name, EL code and number 1-13."""
+    by_id, by_rt, by_code, by_num = {}, {}, {}, {}
+    num_by_name = {name: n for n, name in REGION_NUM.items()}
     for r in state.get("sample", []):
         by_id[int(r["id"])] = r
         rn, ty = _norm(r["region"]), _norm(r["type"])
@@ -70,18 +79,28 @@ def _lookups(state: dict):
         code = REGION_CODES.get(rn)
         if code:
             by_code[(code, ty)] = r
-    return by_id, by_rt, by_code
+        num = num_by_name.get(rn)
+        if num:
+            by_num[(num, ty)] = r
+    return by_id, by_rt, by_code, by_num
 
 
-def _match_stratum(region_val, type_val, by_rt, by_code):
+def _match_stratum(region_val, type_val, lk):
     ur = _urban_rural(type_val)
     if ur is None:
         return None
     ty = _norm(ur)
+    _, by_rt, by_code, by_num = lk
     row = by_rt.get((_norm(region_val), ty))
     if row:
         return row
-    return by_code.get((str(region_val).strip().upper(), ty))
+    row = by_code.get((str(region_val).strip().upper(), ty))
+    if row:
+        return row
+    try:                                    # numeric region code 1-13
+        return by_num.get((int(float(str(region_val).strip())), ty))
+    except (TypeError, ValueError):
+        return None
 
 
 # ------------------------------------------------------------------ template
@@ -103,7 +122,8 @@ def build_template(state: dict) -> bytes:
          "interviews so far (cumulative).", False),
         (f"Put the rows on the '{RESP_SHEET}' tab, keeping only these columns:", False),
         ("    • Interview ID   (optional — used to drop duplicates)", False),
-        ("    • Region (NUTS-2)   — Greek name OR EL.. code (see Reference tab)", False),
+        ("    • Region (NUTS-2)   — number 1-13, EL.. code, or Greek name "
+         "(see Reference tab)", False),
         ("    • Urban/Rural   — Αστικά or Αγροτικά/Ημιαστικά (Urban/Rural also ok)", False),
         ("    • Status   (optional — if present, only Completed rows are counted)", False),
         ("", False),
@@ -131,23 +151,29 @@ def build_template(state: dict) -> bytes:
     ws.freeze_panes = "A2"
 
     ref = wb.create_sheet("Reference")
-    ref.cell(row=1, column=1, value="Valid Region values (name or code)").font = \
-        Font(bold=True)
-    ref.cell(row=2, column=1, value="Region (NUTS-2)").font = Font(bold=True)
-    ref.cell(row=2, column=2, value="Code").font = Font(bold=True)
+    ref.cell(row=1, column=1, value="Valid Region values — use the No., the "
+             "Code, or the name").font = Font(bold=True)
+    ref.cell(row=2, column=1, value="No.").font = Font(bold=True)
+    ref.cell(row=2, column=2, value="Region (NUTS-2)").font = Font(bold=True)
+    ref.cell(row=2, column=3, value="Code").font = Font(bold=True)
+    num_by_name = {name: n for n, name in REGION_NUM.items()}
     seen = []
     for r in state.get("sample", []):
         if r["region"] not in seen:
             seen.append(r["region"])
+    # list in the numeric (NUTS-2 code) order
+    seen.sort(key=lambda nm: num_by_name.get(_norm(nm), 99))
     for i, name in enumerate(seen, start=3):
-        ref.cell(row=i, column=1, value=name)
-        ref.cell(row=i, column=2, value=REGION_CODES.get(_norm(name), ""))
+        ref.cell(row=i, column=1, value=num_by_name.get(_norm(name), ""))
+        ref.cell(row=i, column=2, value=name)
+        ref.cell(row=i, column=3, value=REGION_CODES.get(_norm(name), ""))
     base = len(seen) + 4
     ref.cell(row=base, column=1, value="Valid Urban/Rural values").font = Font(bold=True)
     ref.cell(row=base + 1, column=1, value="Αστικά")
     ref.cell(row=base + 2, column=1, value="Αγροτικά/Ημιαστικά")
-    ref.column_dimensions["A"].width = 34
-    ref.column_dimensions["B"].width = 10
+    ref.column_dimensions["A"].width = 6
+    ref.column_dimensions["B"].width = 34
+    ref.column_dimensions["C"].width = 10
 
     buf = io.BytesIO()
     wb.save(buf)
@@ -189,7 +215,8 @@ def parse_upload(upload, state: dict) -> dict:
     """Return {updates, mode, warnings, counted, excluded}. Nothing is written."""
     df = _read_any(upload).dropna(how="all")
     cm = _colmap(df)
-    by_id, by_rt, by_code = _lookups(state)
+    lk = _lookups(state)
+    by_id = lk[0]
     warnings: list[str] = []
     excluded = 0
 
@@ -210,7 +237,7 @@ def parse_upload(upload, state: dict) -> dict:
         mode = "per-stratum totals"
         for _, row in df.iterrows():
             tr = (by_id.get(to_int(row[cm["id"]])) if "id" in cm else None) \
-                or _match_stratum(row[cm["region"]], row[cm["type"]], by_rt, by_code)
+                or _match_stratum(row[cm["region"]], row[cm["type"]], lk)
             if not tr:
                 warnings.append(f"Row not matched: {row[cm['region']]} / {row[cm['type']]}")
                 continue
@@ -231,7 +258,7 @@ def parse_upload(upload, state: dict) -> dict:
             if "status" in cm and not _is_complete(row[cm["status"]]):
                 excluded += 1
                 continue
-            tr = _match_stratum(row[cm["region"]], row[cm["type"]], by_rt, by_code)
+            tr = _match_stratum(row[cm["region"]], row[cm["type"]], lk)
             if not tr:
                 warnings.append(f"Interview not matched: {row[cm['region']]} / "
                                 f"{row[cm['type']]}")
@@ -257,7 +284,7 @@ def parse_upload(upload, state: dict) -> dict:
 
 
 def apply_updates(state: dict, updates: list[dict]) -> None:
-    by_id, _, _ = _lookups(state)
+    by_id = _lookups(state)[0]
     for u in updates:
         row = by_id[u["id"]]
         row["completes"] = int(u["new_completes"])
