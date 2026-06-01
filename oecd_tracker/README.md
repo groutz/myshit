@@ -42,8 +42,9 @@ Sakis exports the **raw responses** from Survey Solutions — one row per comple
 interview, all interviews so far — trimmed to those columns, and uploads it. The
 app **counts the rows per region × urbanity stratum** to get completes, drops
 duplicate interview IDs, and (if a Status column is present) counts only
-completed rows. Region may be the **number 1–13** (NUTS-2 code order), the EL..
-code, or the Greek name. It
+completed rows. Region is read from Survey Solutions **QD2** (code 1–13, also
+EL.. code or Greek name; -97/-99 excluded) and urbanity from **QD3** (codes 3–5
+= Αστικά, 1–2 = Αγροτικά/Ημιαστικά). It
 previews the change (old → new per stratum) before you **Apply**; strata absent
 from the file are set to 0 since the file is the full cumulative set. A tracked
 task (`P4-7`, owner Αθανάσιος) covers this daily delivery during fieldwork, and a

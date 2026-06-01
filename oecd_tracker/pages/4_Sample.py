@@ -55,7 +55,8 @@ if uploaded is not None:
     else:
         note = f"Detected format: **{result['mode']}** · {result['counted']} completes counted"
         if result["excluded"]:
-            note += f" · {result['excluded']} row(s) excluded by status"
+            note += (f" · {result['excluded']} row(s) excluded "
+                     "(incomplete or no region)")
         st.caption(note)
         if result["warnings"]:
             with st.expander(f"⚠️ {len(result['warnings'])} row(s) not matched"):

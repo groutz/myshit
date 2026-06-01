@@ -34,13 +34,20 @@ REGION_CODES = {
     "πελοποννησος": "EL65",
 }
 
-# Survey Solutions numbers the 13 regions 1-13 in NUTS-2 code order.
+# Survey Solutions question QD2: region single-select codes 01-13.
+# (08 "Κεντρικής Ελλάδας" is the region we hold as Στερεά Ελλάδα.)
 REGION_NUM = {
-    1: "αττικη", 2: "βορειο αιγαιο", 3: "νοτιο αιγαιο", 4: "κρητη",
-    5: "ανατολικη μακεδονια και θρακη", 6: "κεντρικη μακεδονια",
-    7: "δυτικη μακεδονια", 8: "ηπειρος", 9: "θεσσαλια", 10: "ιονια νησια",
-    11: "δυτικη ελλαδα", 12: "στερεα ελλαδα", 13: "πελοποννησος",
+    1: "αττικη", 2: "κεντρικη μακεδονια", 3: "θεσσαλια", 4: "δυτικη ελλαδα",
+    5: "κρητη", 6: "ανατολικη μακεδονια και θρακη", 7: "πελοποννησος",
+    8: "στερεα ελλαδα", 9: "ηπειρος", 10: "νοτιο αιγαιο", 11: "δυτικη μακεδονια",
+    12: "ιονια νησια", 13: "βορειο αιγαιο",
 }
+NO_REGION_CODES = {-97, -99}        # QD2: don't know / no answer
+
+# Survey Solutions question QD3: settlement size 01-05, collapsed to the two
+# strata categories — urban = small city and larger (03-05, >=15k).
+URBAN_CODES = {3, 4, 5}
+RURAL_CODES = {1, 2}
 
 
 # --------------------------------------------------------------- normalising
@@ -51,7 +58,19 @@ def _norm(s) -> str:
     return s.strip().lower()
 
 
+def _as_int(value):
+    try:
+        return int(float(str(value).strip()))
+    except (TypeError, ValueError):
+        return None
+
+
 def _urban_rural(value) -> str | None:
+    code = _as_int(value)                       # QD3 numeric code 01-05
+    if code in URBAN_CODES:
+        return "Αστικά"
+    if code in RURAL_CODES:
+        return "Αγροτικά/Ημιαστικά"
     n = _norm(value)
     if not n:
         return None
@@ -61,6 +80,10 @@ def _urban_rural(value) -> str | None:
     if "αστ" in n or "ast" in n or "urban" in n or n in ("u",):
         return "Αστικά"
     return None
+
+
+def _is_no_region(value) -> bool:
+    return _as_int(value) in NO_REGION_CODES
 
 
 def _is_complete(value) -> bool:
@@ -122,9 +145,10 @@ def build_template(state: dict) -> bytes:
          "interviews so far (cumulative).", False),
         (f"Put the rows on the '{RESP_SHEET}' tab, keeping only these columns:", False),
         ("    • Interview ID   (optional — used to drop duplicates)", False),
-        ("    • Region (NUTS-2)   — number 1-13, EL.. code, or Greek name "
-         "(see Reference tab)", False),
-        ("    • Urban/Rural   — Αστικά or Αγροτικά/Ημιαστικά (Urban/Rural also ok)", False),
+        ("    • Region   — QD2 code 1-13 (or EL.. code / Greek name; see "
+         "Reference tab). -97/-99 are excluded.", False),
+        ("    • Urban/Rural   — QD3 code 1-5: 3,4,5 = Αστικά; 1,2 = "
+         "Αγροτικά/Ημιαστικά.", False),
         ("    • Status   (optional — if present, only Completed rows are counted)", False),
         ("", False),
         ("The app counts the rows in each region × urbanity stratum to get "
@@ -151,11 +175,11 @@ def build_template(state: dict) -> bytes:
     ws.freeze_panes = "A2"
 
     ref = wb.create_sheet("Reference")
-    ref.cell(row=1, column=1, value="Valid Region values — use the No., the "
-             "Code, or the name").font = Font(bold=True)
-    ref.cell(row=2, column=1, value="No.").font = Font(bold=True)
-    ref.cell(row=2, column=2, value="Region (NUTS-2)").font = Font(bold=True)
-    ref.cell(row=2, column=3, value="Code").font = Font(bold=True)
+    ref.cell(row=1, column=1, value="Region — QD2 code, or EL.. code, or name")\
+        .font = Font(bold=True)
+    ref.cell(row=2, column=1, value="QD2").font = Font(bold=True)
+    ref.cell(row=2, column=2, value="Region").font = Font(bold=True)
+    ref.cell(row=2, column=3, value="EL code").font = Font(bold=True)
     num_by_name = {name: n for n, name in REGION_NUM.items()}
     seen = []
     for r in state.get("sample", []):
@@ -168,10 +192,13 @@ def build_template(state: dict) -> bytes:
         ref.cell(row=i, column=2, value=name)
         ref.cell(row=i, column=3, value=REGION_CODES.get(_norm(name), ""))
     base = len(seen) + 4
-    ref.cell(row=base, column=1, value="Valid Urban/Rural values").font = Font(bold=True)
-    ref.cell(row=base + 1, column=1, value="Αστικά")
-    ref.cell(row=base + 2, column=1, value="Αγροτικά/Ημιαστικά")
-    ref.column_dimensions["A"].width = 6
+    ref.cell(row=base, column=1, value="Urban/Rural — QD3 code → stratum")\
+        .font = Font(bold=True)
+    ref.cell(row=base + 1, column=1, value="3, 4, 5")
+    ref.cell(row=base + 1, column=2, value="Αστικά")
+    ref.cell(row=base + 2, column=1, value="1, 2")
+    ref.cell(row=base + 2, column=2, value="Αγροτικά/Ημιαστικά")
+    ref.column_dimensions["A"].width = 8
     ref.column_dimensions["B"].width = 34
     ref.column_dimensions["C"].width = 10
 
@@ -256,6 +283,9 @@ def parse_upload(upload, state: dict) -> dict:
             df = df.drop_duplicates(subset=[cm["id"]])
         for _, row in df.iterrows():
             if "status" in cm and not _is_complete(row[cm["status"]]):
+                excluded += 1
+                continue
+            if _is_no_region(row[cm["region"]]):       # QD2 -97 / -99
                 excluded += 1
                 continue
             tr = _match_stratum(row[cm["region"]], row[cm["type"]], lk)
