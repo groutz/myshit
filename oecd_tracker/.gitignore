@@ -3,3 +3,6 @@
 state.json
 __pycache__/
 *.pyc
+
+# Real secrets must never be committed (only the .example template is tracked).
+.streamlit/secrets.toml

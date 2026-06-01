@@ -1,3 +1,7 @@
 streamlit>=1.30.0
 pandas>=2.0.0
 plotly>=5.18.0
+# Cloud persistence backend (Google Sheets). Unused when running locally with
+# the default file store, but required for the Streamlit Cloud deployment.
+gspread>=6.0.0
+google-auth>=2.27.0

@@ -7,7 +7,7 @@ import json
 import streamlit as st
 
 import logic
-from store import STATE_FILE, get_state, reset_state, save_state
+from store import backend_label, get_state, reset_state, save_state
 from ui import page_header, saved_toast, setup
 
 setup("Settings", "⚙️")
@@ -77,7 +77,7 @@ with c9:
 
 st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
 st.markdown("#### Danger zone")
-st.caption(f"State file: `{STATE_FILE}`")
+st.caption(f"Storage backend: **{backend_label()}**")
 if st.button("♻️ Reset everything to the original Excel data"):
     reset_state()
     st.warning("All edits discarded — reseeded from the original workbook.")

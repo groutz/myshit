@@ -44,9 +44,61 @@ Then open the URL Streamlit prints (default http://localhost:8501).
 
 ## Data & persistence
 
-- `seed_data.json` — the clean baseline extracted from the original workbook
-  (`OECD_INFE_2026_PM_Tracker_v1.xlsx`). Committed; this is the reset point.
-- `state.json` — your live working data, created on first run and updated on
-  every **Save**. Git-ignored so the repo keeps the clean baseline.
-- **Settings → Export/Import** gives you JSON snapshots for backup or moving
-  between machines; **Reset** restores the original Excel data.
+The app picks its storage backend automatically:
+
+- **Local file** (default, when you run it on your machine): edits persist to
+  `state.json` in this folder. Git-ignored, so the repo always keeps the clean
+  baseline.
+- **Google Sheet** (cloud): used automatically when Streamlit secrets contain a
+  `[gcp_service_account]` block and `[sheets] spreadsheet_key`. The whole state
+  is gzip+base64-encoded into a private Sheet so your inputs survive Streamlit
+  Community Cloud's ephemeral filesystem.
+
+`seed_data.json` is the clean baseline extracted from the original workbook
+(`OECD_INFE_2026_PM_Tracker_v1.xlsx`) and is the **Settings → Reset** point.
+**Settings → Export/Import** gives you JSON snapshots regardless of backend.
+The active backend is shown at the bottom of the **Settings** page.
+
+---
+
+## Deploy as a private cloud web app
+
+This gives you a URL you can open from anywhere, with your edits saved to a
+private Google Sheet and the app visible only to people you invite.
+
+### A. Create a Google Sheet + service account (persistence)
+
+1. Create a new, empty Google Sheet. Copy the **ID** from its URL —
+   `https://docs.google.com/spreadsheets/d/`**`THIS_PART`**`/edit`.
+2. Go to <https://console.cloud.google.com> → create (or pick) a project.
+3. **APIs & Services → Library** → enable **Google Sheets API**.
+4. **APIs & Services → Credentials → Create credentials → Service account**.
+   Give it a name (e.g. `tracker-bot`), create it, then under its **Keys** tab
+   → **Add key → JSON**. A `.json` file downloads — keep it safe.
+5. Open that JSON; copy the `client_email` (looks like
+   `tracker-bot@…iam.gserviceaccount.com`). Back in your Google Sheet, click
+   **Share** and give that email **Editor** access.
+
+### B. Deploy on Streamlit Community Cloud
+
+1. <https://share.streamlit.io> → **Sign in with GitHub** (the account that owns
+   `groutz/myshit`).
+2. **Create app → Deploy from GitHub**:
+   - Repository: `groutz/myshit`
+   - Branch: `main` (after merging PR #6) or `claude/funny-cannon-aieBW`
+   - **Main file path:** `oecd_tracker/app.py`
+3. Before/after deploying, open **Settings → Secrets** and paste the contents of
+   [`.streamlit/secrets.toml.example`](.streamlit/secrets.toml.example), filled
+   in from your service-account JSON, plus your `spreadsheet_key`. Save — the app
+   restarts and now reads/writes the Sheet.
+
+### C. Make it private (required — the data is confidential)
+
+In the app's **Settings → Sharing**, set **"Who can view this app"** to
+**specific people** and add the email addresses allowed in (Google sign-in).
+The README of the source workbook is explicit: Shadow dates, the Risk Watchlist
+and Buffers are **INTERNAL** — never leave the app on public sharing.
+
+> Running locally instead? Copy `.streamlit/secrets.toml.example` to
+> `.streamlit/secrets.toml` and fill it in to use the same Sheet from your Mac;
+> omit it to keep using the local `state.json` file.
