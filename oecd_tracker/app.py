@@ -132,7 +132,7 @@ with right:
     fig.update_layout(
         xaxis=dict(range=[0, 100], title="% complete", ticksuffix="%"),
         yaxis=dict(autorange="reversed"), height=300,
-        margin=dict(l=0, r=20, t=10, b=10),
+        margin=dict(l=0, r=20, t=10, b=10), font=dict(family="Arial"),
         plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(fig, use_container_width=True)
 

@@ -1,8 +1,9 @@
-"""Project Status — an auto-written status note, shareable with the client.
+"""Project Status — a client-ready weekly progress email.
 
-Generated from the live data in a credible, transparent, bureaucratic register.
-Client-safe by default: it uses only externally-committed (contract) dates and
-never exposes shadow dates, the risk watchlist or buffers (workbook rule).
+Written in the register of a weekly update to the Contracting Authority and
+derived from current task/milestone status. It contains NO internal task
+descriptions, shadow dates, risks or buffers — only a high-level overview that
+is safe to send. An optional internal annex (for the PM only) is off by default.
 """
 
 from __future__ import annotations
@@ -13,101 +14,117 @@ import logic
 from store import get_state
 from ui import page_header, setup
 
-setup("Project Status", "📄")
+setup("Project Status", "📧")
 state = get_state()
 now = logic.today(state)
 meta = state.get("meta", {})
 cfg = state.get("settings", {})
 
-page_header("Project Status note",
-            "Auto-generated from current task reporting. Client-safe wording; "
-            "review before sending. Internal annex is for your eyes only.")
+page_header("Weekly status — client email",
+            "Auto-drafted from current progress, in weekly-update language. "
+            "Safe to send: no internal task detail, shadow dates, risks or "
+            "buffers. Review before sending.")
 
-include_internal = st.toggle("Include internal annex (risks / critical path) — "
-                             "DO NOT send to client", value=False)
+include_internal = st.toggle("Append internal annex (PM only — DO NOT send)",
+                             value=False)
 
-# client-facing phrasing for internal statuses
-CLIENT = {
-    logic.STATUS_DONE: "Completed",
-    logic.STATUS_ON_TRACK: "On schedule",
-    logic.STATUS_AT_RISK: "Underway",
-    logic.STATUS_SLIPPING: "Underway",
-    logic.STATUS_NOT_STARTED: "Scheduled (not yet commenced)",
-}
-
+# ----------------------------------------------------------------- inputs
 overall = logic.overall_progress(state)
 ms = logic.milestone_rows(state)
-done = sum(1 for m in ms if m["status"] == logic.STATUS_DONE)
+phases = logic.phase_rows(state)
+done_ms = [m for m in ms if m["status"] == logic.STATUS_DONE]
 final_c = logic.parse_date(cfg.get("final_contract"))
-days_to_final = logic.days_between(now, final_c)
 totals = logic.sample_totals(state)
+fw_start = logic.parse_date(cfg.get("fieldwork_start"))
+fw_end = logic.parse_date(cfg.get("fieldwork_end"))
+in_fieldwork = bool(fw_start and fw_end and fw_start <= now <= fw_end)
 
-# ----------------------------------------------------------------- narrative
+# current focus = first phase in progress, else first not-yet-complete
+current_idx = next((i for i, p in enumerate(phases) if 0 < p["pct"] < 100), None)
+if current_idx is None:
+    current_idx = next((i for i, p in enumerate(phases) if p["pct"] < 100), len(phases) - 1)
+current_phase = phases[current_idx]["name"]
+next_idx = next((i for i, p in enumerate(phases) if p["pct"] < 100), None)
+
+PM = meta.get("PM", "")
+subject = (f"Weekly Progress Update — OECD/INFE 2026 Survey of Adult Financial "
+           f"Literacy (Greece) — {now:%d %B %Y}")
+
+# ----------------------------------------------------------------- body
 L: list[str] = []
-L.append(f"# Project Status Report")
-L.append(f"**Project:** {meta.get('Project', 'OECD/INFE 2026 — Greece')}")
-L.append(f"**Contracting authority:** {meta.get('Contracting Authority', '')}")
-L.append(f"**Contractor:** {meta.get('Contractor', '')}")
-L.append(f"**Project Manager:** {meta.get('PM', '')}")
-L.append(f"**Reporting date:** {now:%d %B %Y}")
+L.append(f"**To:** {meta.get('Contracting Authority', 'Contracting Authority')}")
+L.append(f"**From:** {PM}, Project Manager — Κάπα Research")
+L.append(f"**Date:** {now:%d %B %Y}")
+L.append(f"**Subject:** {subject}")
 L.append("")
-L.append("## 1. Summary")
+L.append("Dear Sir/Madam,")
+L.append("")
+L.append("Please find below this week's progress update on the OECD/INFE 2026 "
+         "International Survey of Adult Financial Literacy, Inclusion and "
+         "Well-Being in Greece.")
+L.append("")
 
+# overall
 if overall >= 99:
-    summ = ("All contracted work streams are complete. The project is being "
-            "finalised for delivery.")
-elif done == 0 and overall < 5:
-    summ = ("The project is in its initial set-up phase. Preparatory work is "
-            "proceeding in line with the agreed schedule.")
+    L.append("All contracted activities have now been completed and the project "
+             "is being finalised for delivery. The project has proceeded fully "
+             "in line with the agreed timetable.")
+elif overall < 5 and not done_ms:
+    L.append("The project has been initiated and preparatory activities are "
+             "under way, proceeding in line with the agreed timetable.")
 else:
-    summ = (f"Implementation is progressing as planned, with overall completion "
-            f"at approximately {overall:.0f}%. {done} of {len(ms)} contractual "
-            f"milestones have been completed to date.")
-if days_to_final is not None and days_to_final >= 0:
-    summ += (f" Final delivery remains scheduled for "
-             f"{final_c:%d %B %Y} ({days_to_final} days from this report).")
-L.append(summ)
+    L.append(f"Project implementation is progressing in line with the agreed "
+             f"timetable. To date, {len(done_ms)} of {len(ms)} contractual "
+             f"milestones have been completed, and overall progress stands at "
+             f"approximately {overall:.0f}%. Work is currently centred on the "
+             f"{current_phase} phase.")
 L.append("")
 
-L.append("## 2. Milestone status")
-L.append("| Milestone | Contractual date | Status | Completion |")
-L.append("|---|---|---|---|")
-for m in ms:
-    cdate = logic.parse_date(m.get("contract"))
-    L.append(f"| {m['name']} | {cdate:%d %b %Y} | {CLIENT.get(m['status'], m['status'])} "
-             f"| {m['pct']:.0f}% |")
+# milestones (high level, names only)
+if done_ms:
+    names = ", ".join(m["name"].split(" (")[0] for m in done_ms)
+    L.append(f"Milestones completed to date: {names}.")
+    L.append("")
+
+# fieldwork, only while it is meaningful
+if in_fieldwork or totals["completes"] > 0:
+    L.append(f"Fieldwork is under way. As at the date of this report, "
+             f"{totals['completes']} interviews have been completed against a "
+             f"target of {totals['target']} ({totals['pct']:.0f}%), with data "
+             f"collection proceeding across all 26 sampling strata (NUTS-2 "
+             f"region × urban/rural). Sample balance is being monitored "
+             f"continuously to ensure representativeness.")
+    L.append("")
+
+# outlook (phase-level, no task detail)
+if next_idx is not None and overall < 99:
+    nxt = phases[next_idx]["name"]
+    if 0 < phases[next_idx]["pct"] < 100:
+        L.append(f"Over the coming period, work will continue on the {nxt} phase.")
+    else:
+        L.append(f"Over the coming period, the project will move into the "
+                 f"{nxt} phase.")
+    L.append("")
+
+if final_c:
+    L.append(f"The project remains on schedule for final delivery on "
+             f"{final_c:%d %B %Y}.")
+    L.append("")
+
+L.append("We remain at your disposal for any clarification you may require.")
 L.append("")
+L.append("Kind regards,")
+L.append(f"{PM}")
+L.append("Project Manager — Κάπα Research – Consulting AE")
 
-# fieldwork / sample, only once it is meaningful
-if totals["completes"] > 0:
-    L.append("## 3. Fieldwork progress")
-    L.append(f"A total of {totals['completes']} completed interviews have been "
-             f"recorded against a target of {totals['target']} "
-             f"({totals['pct']:.0f}%). Sampling across the 26 NUTS-2 strata is "
-             f"being monitored to ensure balanced representation.")
-    L.append("")
-
-# next steps from the next open tasks (generic, no internal detail)
-nxt = [t for t in logic.upcoming_tasks(state, limit=4)]
-if nxt:
-    L.append("## 4. Next steps")
-    for t in nxt:
-        due = t["due"].strftime("%d %B %Y") if t["due"] else "the coming period"
-        L.append(f"- {t['title']} (target: {due}).")
-    L.append("")
-
-L.append("## 5. Compliance")
-L.append("Work continues in accordance with the OECD/INFE Toolkit 2026 "
-         "methodology and the contractual data template. GDPR compliance is "
-         "maintained throughout. Weekly progress reports are provided to the "
-         "Contracting Authority every Monday by 14:00 (Athens) throughout the "
-         "fieldwork period.")
-
-narrative = "\n".join(L)
+email = "\n".join(L)
 
 # ----------------------------------------------------------------- internal annex
 if include_internal:
     A = ["", "---", "## INTERNAL ANNEX — NOT FOR DISTRIBUTION", ""]
+    A.append(f"Internal (shadow) final date: "
+             f"{logic.parse_date(cfg.get('final_shadow')):%d %B %Y}")
+    A.append("")
     A.append("### Critical path")
     for c in logic.critical_path_rows(state):
         A.append(f"- [{c['status']}] {c['item']} — {c['owner']} ({c['pct']:.0f}%)")
@@ -115,17 +132,14 @@ if include_internal:
     A.append("### Risk watchlist")
     for r in logic.risk_rows(state):
         A.append(f"- [{r['auto_status']}] {r['risk']} "
-                 f"(L:{r['likelihood']}/I:{r['impact']}) — {r['mitigation']}")
-    A.append("")
-    A.append(f"### Internal (shadow) final date: "
-             f"{logic.parse_date(cfg.get('final_shadow')):%d %B %Y}")
-    narrative += "\n".join(A)
+                 f"(L:{r['likelihood']}/I:{r['impact']})")
+    email += "\n".join(A)
 
 st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
-st.markdown(narrative)
+st.markdown(email)
 
 st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
-st.download_button("⬇️ Download as Markdown", data=narrative,
-                   file_name=f"project_status_{now:%Y%m%d}.md", mime="text/markdown")
-with st.expander("📋 Copy the raw text"):
-    st.code(narrative, language="markdown")
+st.download_button("⬇️ Download email (.txt)", data=email,
+                   file_name=f"weekly_update_{now:%Y%m%d}.txt", mime="text/plain")
+with st.expander("📋 Copy the email text"):
+    st.code(email, language="text")
