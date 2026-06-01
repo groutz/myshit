@@ -25,7 +25,10 @@
     "qa_target_pct": 12.5,
     "booster_decision_date": "2026-07-22",
     "booster_threshold_pct": 70,
-    "friday_deadline": "14:00 Athens"
+    "fieldwork_start": "2026-06-22",
+    "fieldwork_end": "2026-07-16",
+    "report_day": "Monday",
+    "report_deadline": "Monday 14:00 Athens"
   },
   "milestones": [
     {
@@ -1161,169 +1164,6 @@
       "outcome": "Ok",
       "minuted": true,
       "notes": ""
-    }
-  ],
-  "friday_reports": [
-    {
-      "date": "2026-05-29",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-06-05",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-06-12",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-06-19",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-06-26",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-07-03",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-07-10",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-07-17",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-07-24",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-07-31",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-08-07",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-08-14",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-08-21",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-08-28",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-09-04",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-09-11",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-09-18",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-09-25",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-10-02",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-10-09",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-10-16",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-10-23",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
-    },
-    {
-      "date": "2026-10-30",
-      "sent": false,
-      "sent_at": "",
-      "highlights": "",
-      "link": ""
     }
   ],
   "fieldwork_daily": [
@@ -2922,6 +2762,36 @@
       "result": "",
       "issue_type": "",
       "notes": ""
+    }
+  ],
+  "weekly_reports": [
+    {
+      "date": "2026-06-22",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-06-29",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-07-06",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
+    },
+    {
+      "date": "2026-07-13",
+      "sent": false,
+      "sent_at": "",
+      "highlights": "",
+      "link": ""
     }
   ]
 }

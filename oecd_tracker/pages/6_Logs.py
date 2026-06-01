@@ -1,4 +1,4 @@
-"""Operational logs — Friday Reports, Fieldwork Daily, Interviewers, QA Log."""
+"""Operational logs — Weekly Reports, Fieldwork Daily, Interviewers, QA Log."""
 
 from __future__ import annotations
 
@@ -11,14 +11,18 @@ from ui import page_header, saved_toast, setup
 setup("Logs", "🗒️")
 state = get_state()
 page_header("Operational logs",
-            "Working logs you fill in as the project runs. Friday-report and "
+            "Working logs you fill in as the project runs. Weekly-report and "
             "interviewer-bench counts surface on their summaries below.")
 
-tabs = st.tabs(["📅 Friday Reports", "📈 Fieldwork Daily", "🧑‍💼 Interviewers", "🔎 QA Log"])
+tabs = st.tabs(["📅 Weekly Reports", "📈 Fieldwork Daily", "🧑‍💼 Interviewers", "🔎 QA Log"])
 
-# ----------------------------------------------------------- Friday Reports
+# ----------------------------------------------------------- Weekly Reports
 with tabs[0]:
-    fr = state.get("friday_reports", [])
+    cfg = state.get("settings", {})
+    st.caption(f"Sent to the client **{cfg.get('report_deadline', 'Monday 14:00 Athens')}**, "
+               f"**only during the fieldwork period** "
+               f"({cfg.get('fieldwork_start', '')} → {cfg.get('fieldwork_end', '')}).")
+    fr = state.get("weekly_reports", [])
     sent = sum(1 for r in fr if r.get("sent"))
     st.metric("Reports sent", f"{sent} / {len(fr)}")
     df = pd.DataFrame(fr)
@@ -26,18 +30,18 @@ with tabs[0]:
     e = st.data_editor(
         df,
         column_config={
-            "date": st.column_config.DateColumn("Friday", format="DD MMM YYYY", disabled=True),
+            "date": st.column_config.DateColumn("Monday", format="DD MMM YYYY", disabled=True),
             "sent": st.column_config.CheckboxColumn("Sent?"),
             "sent_at": st.column_config.TextColumn("Sent at"),
             "highlights": st.column_config.TextColumn("Highlights / KPI", width="large"),
             "link": st.column_config.TextColumn("Link / version"),
         },
         column_order=["date", "sent", "sent_at", "highlights", "link"],
-        hide_index=True, use_container_width=True, key="fr_editor",
+        hide_index=True, use_container_width=True, key="wr_editor",
     )
-    if st.button("💾 Save Friday Reports", type="primary", key="save_fr"):
+    if st.button("💾 Save Weekly Reports", type="primary", key="save_wr"):
         e["date"] = e["date"].apply(lambda d: d.strftime("%Y-%m-%d") if pd.notna(d) else "")
-        state["friday_reports"] = e.to_dict("records")
+        state["weekly_reports"] = e.to_dict("records")
         save_state(); saved_toast(); st.rerun()
 
 # ----------------------------------------------------------- Fieldwork Daily

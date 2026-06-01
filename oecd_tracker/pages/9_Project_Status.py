@@ -99,8 +99,9 @@ if nxt:
 L.append("## 5. Compliance")
 L.append("Work continues in accordance with the OECD/INFE Toolkit 2026 "
          "methodology and the contractual data template. GDPR compliance is "
-         "maintained throughout. Weekly progress reporting to the Contracting "
-         "Authority is being provided as scheduled.")
+         "maintained throughout. Weekly progress reports are provided to the "
+         "Contracting Authority every Monday by 14:00 (Athens) throughout the "
+         "fieldwork period.")
 
 narrative = "\n".join(L)
 

@@ -162,6 +162,16 @@ def _migrate(state: dict) -> dict:
     for r in state.get("risks", []):
         if not r.get("phase"):
             r["phase"] = seed_rk.get(r.get("id"), {}).get("phase", "")
+
+    # weekly reports moved from Fridays (whole project) to Mondays during the
+    # fieldwork window — adopt the new schedule + settings if not present yet.
+    cfg = state.setdefault("settings", {})
+    for k in ("fieldwork_start", "fieldwork_end", "report_day", "report_deadline"):
+        if not cfg.get(k):
+            cfg[k] = seed["settings"].get(k)
+    if "weekly_reports" not in state:
+        state["weekly_reports"] = seed.get("weekly_reports", [])
+        state.pop("friday_reports", None)
     return state
 
 

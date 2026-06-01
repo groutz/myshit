@@ -28,7 +28,7 @@ Then open the URL Streamlit prints (default http://localhost:8501).
 | **Milestones** | edit dates only (% is derived) | Green/Amber/Red/Grey status + days-to-shadow |
 | **Sample** | enter completes per stratum | % of target, booster flags, totals |
 | **Critical Path & Risks** | edit wording/mitigations (status auto) | open-item counts on the Dashboard |
-| **Logs** | Friday reports, daily KPIs, interviewer bench, QA log | running operational record |
+| **Logs** | weekly reports (Mondays, fieldwork only), daily KPIs, interviewer bench, QA log | running operational record |
 | **Reference** | Team, Buffers, Kickoff Playbook, Project info | standing context |
 | **Project Status** | (read-only) | a client-safe written status note to download/share |
 | **Settings** | dates, targets, today-override, export/import, reset | what-if scenarios + backup |
