@@ -447,14 +447,14 @@
         },
         {
           "id": "P4-7",
-          "task": "Deliver daily sample-completion update: export region × urbanity completes from Survey Solutions and upload to the Sample tracker (every fieldwork day, by 10:00).",
+          "task": "Deliver daily sample responses: export the raw completed-interviews file (region & urbanity columns) from Survey Solutions and upload to the Sample tracker (every fieldwork day, by 10:00).",
           "owner": "Αθανάσιος",
           "type": "percent",
           "weight": 3,
           "effort_days": 1,
           "due": "2026-06-22",
           "assign_by": "2026-06-19",
-          "notes": "Use the daily-update template. Cumulative completes per stratum.",
+          "notes": "Raw responses, one row per completed interview, all interviews so far.",
           "pct": 0
         }
       ]

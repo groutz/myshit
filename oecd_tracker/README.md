@@ -33,18 +33,20 @@ Then open the URL Streamlit prints (default http://localhost:8501).
 | **Project Status** | (read-only) | a client-safe written status note to download/share |
 | **Settings** | dates, targets, today-override, export/import, reset | what-if scenarios + backup |
 
-### Daily sample update (Survey Solutions → Excel → upload)
+### Daily sample update (Survey Solutions raw responses → upload)
 
-On the **Sample** page, **Download the template for Sakis** (Αθανάσιος) — a
-pre-filled `.xlsx` with the 26 strata. Each fieldwork day he exports completion
-data (region × urbanity) from Survey Solutions, enters the cumulative
-**Completes** per stratum, and uploads the file. The app previews the changes
-(old → new per stratum) before you **Apply**. The parser accepts either the
-per-stratum template (matched by ID) or a raw per-interview export (one
-completed interview per row, with Region + Urban/Rural columns), which it counts
-per stratum automatically. A tracked task (`P4-7`, owner Αθανάσιος) covers this
-daily delivery during fieldwork. A ready copy of the template lives in
-[`templates/`](templates/).
+On the **Sample** page, **Download the template for Sakis** (Αθανάσιος) — it
+defines the columns to keep (Interview ID, Region (NUTS-2), Urban/Rural,
+optional Status) and lists the valid region/urbanity values. Each fieldwork day
+Sakis exports the **raw responses** from Survey Solutions — one row per completed
+interview, all interviews so far — trimmed to those columns, and uploads it. The
+app **counts the rows per region × urbanity stratum** to get completes, drops
+duplicate interview IDs, and (if a Status column is present) counts only
+completed rows. Region may be the Greek name **or** the EL.. NUTS-2 code. It
+previews the change (old → new per stratum) before you **Apply**; strata absent
+from the file are set to 0 since the file is the full cumulative set. A tracked
+task (`P4-7`, owner Αθανάσιος) covers this daily delivery during fieldwork, and a
+copy of the template lives in [`templates/`](templates/).
 
 ### The task model (how "report one thing, the rest fills in" works)
 

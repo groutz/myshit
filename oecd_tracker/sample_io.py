@@ -1,10 +1,10 @@
 """Sample tracker daily-update I/O.
 
-Αθανάσιος (Sakis) exports completion data (with region & urbanity) from Survey
-Solutions, drops the numbers into the daily template, and uploads the file here.
-This module builds that template and parses an upload back into per-stratum
-updates — supporting both the per-stratum template and a raw per-interview
-export (one completed interview per row), which it aggregates automatically.
+Αθανάσιος (Sakis) delivers the raw responses file from Survey Solutions — one
+row per completed interview, all interviews so far (cumulative), trimmed to just
+the variables needed here: an interview id, region and urbanity (and optionally
+a status). This module builds that template and parses an upload into per-stratum
+completes by counting the rows that fall in each region × urbanity stratum.
 """
 
 from __future__ import annotations
@@ -14,9 +14,25 @@ import unicodedata
 
 import pandas as pd
 
-TEMPLATE_SHEET = "Daily Update"
-COLUMNS = ["ID", "Region (NUTS-2)", "Urban/Rural", "Target",
-           "Completes", "Refusals", "Calls placed"]
+RESP_SHEET = "Responses"
+
+# 13 NUTS-2 regions -> code, keyed by accent-stripped lowercase name so the
+# uploaded file may carry either the Greek name or the EL.. code.
+REGION_CODES = {
+    "αττικη": "EL30",
+    "βορειο αιγαιο": "EL41",
+    "νοτιο αιγαιο": "EL42",
+    "κρητη": "EL43",
+    "ανατολικη μακεδονια και θρακη": "EL51",
+    "κεντρικη μακεδονια": "EL52",
+    "δυτικη μακεδονια": "EL53",
+    "ηπειρος": "EL54",
+    "θεσσαλια": "EL61",
+    "ιονια νησια": "EL62",
+    "δυτικη ελλαδα": "EL63",
+    "στερεα ελλαδα": "EL64",
+    "πελοποννησος": "EL65",
+}
 
 
 # --------------------------------------------------------------- normalising
@@ -28,7 +44,6 @@ def _norm(s) -> str:
 
 
 def _urban_rural(value) -> str | None:
-    """Map any urban/rural label to one of the two canonical Greek strings."""
     n = _norm(value)
     if not n:
         return None
@@ -40,18 +55,39 @@ def _urban_rural(value) -> str | None:
     return None
 
 
+def _is_complete(value) -> bool:
+    n = _norm(value)
+    return any(t in n for t in ("complet", "approv", "ολοκλ", "εγκ"))
+
+
 def _lookups(state: dict):
-    """id->row, and normalised (region,type)->row, from current sample."""
-    by_id, by_rt = {}, {}
+    """id->row, (region_name,type)->row, (region_code,type)->row."""
+    by_id, by_rt, by_code = {}, {}, {}
     for r in state.get("sample", []):
         by_id[int(r["id"])] = r
-        by_rt[(_norm(r["region"]), _norm(r["type"]))] = r
-    return by_id, by_rt
+        rn, ty = _norm(r["region"]), _norm(r["type"])
+        by_rt[(rn, ty)] = r
+        code = REGION_CODES.get(rn)
+        if code:
+            by_code[(code, ty)] = r
+    return by_id, by_rt, by_code
+
+
+def _match_stratum(region_val, type_val, by_rt, by_code):
+    ur = _urban_rural(type_val)
+    if ur is None:
+        return None
+    ty = _norm(ur)
+    row = by_rt.get((_norm(region_val), ty))
+    if row:
+        return row
+    return by_code.get((str(region_val).strip().upper(), ty))
 
 
 # ------------------------------------------------------------------ template
 def build_template(state: dict) -> bytes:
-    """A pre-filled .xlsx (Instructions + data sheet) for Sakis to populate."""
+    """A raw-responses template (Instructions + empty Responses sheet +
+    Reference list of valid region/urbanity values) for Sakis to populate."""
     from openpyxl import Workbook
     from openpyxl.styles import Alignment, Font, PatternFill
 
@@ -59,46 +95,59 @@ def build_template(state: dict) -> bytes:
     info = wb.active
     info.title = "Instructions"
     lines = [
-        ("OECD/INFE 2026 — Greece · Sample daily update", True),
+        ("OECD/INFE 2026 — Greece · Sample daily responses", True),
         ("", False),
         ("Owner: Αθανάσιος (Sakis). Deliver every fieldwork day by 10:00.", False),
         ("", False),
-        ("1. In Survey Solutions, export completed interviews with region and "
-         "urban/rural.", False),
-        ("2. Enter the CUMULATIVE totals to date per stratum on the "
-         f"'{TEMPLATE_SHEET}' tab.", False),
-        ("3. Fill 'Completes' (required). 'Refusals' and 'Calls placed' are "
-         "optional.", False),
-        ("4. Do NOT change the ID, Region or Urban/Rural columns — they are how "
-         "the app matches rows.", False),
-        ("5. Save and upload the file on the Sample page of the tracker.", False),
+        ("Provide the RAW responses data: one row per COMPLETED interview, all "
+         "interviews so far (cumulative).", False),
+        (f"Put the rows on the '{RESP_SHEET}' tab, keeping only these columns:", False),
+        ("    • Interview ID   (optional — used to drop duplicates)", False),
+        ("    • Region (NUTS-2)   — Greek name OR EL.. code (see Reference tab)", False),
+        ("    • Urban/Rural   — Αστικά or Αγροτικά/Ημιαστικά (Urban/Rural also ok)", False),
+        ("    • Status   (optional — if present, only Completed rows are counted)", False),
         ("", False),
-        ("Numbers are cumulative snapshots: each upload REPLACES the previous "
-         "values.", False),
+        ("The app counts the rows in each region × urbanity stratum to get "
+         "completes. Each upload REPLACES the previous counts.", False),
+        ("Save and upload on the Sample page of the tracker.", False),
     ]
     for i, (txt, bold) in enumerate(lines, 1):
         c = info.cell(row=i, column=1, value=txt)
         if bold:
             c.font = Font(bold=True, size=13)
-    info.column_dimensions["A"].width = 90
+    info.column_dimensions["A"].width = 92
 
-    ws = wb.create_sheet(TEMPLATE_SHEET)
     head_fill = PatternFill("solid", fgColor="1A73E8")
-    for j, name in enumerate(COLUMNS, 1):
+
+    ws = wb.create_sheet(RESP_SHEET)
+    for j, name in enumerate(["Interview ID", "Region (NUTS-2)", "Urban/Rural",
+                              "Status"], 1):
         c = ws.cell(row=1, column=j, value=name)
         c.font = Font(bold=True, color="FFFFFF")
         c.fill = head_fill
         c.alignment = Alignment(horizontal="center")
-    for i, r in enumerate(state.get("sample", []), start=2):
-        ws.cell(row=i, column=1, value=int(r["id"]))
-        ws.cell(row=i, column=2, value=r["region"])
-        ws.cell(row=i, column=3, value=r["type"])
-        ws.cell(row=i, column=4, value=int(r.get("target", 0)))
-        # leave Completes / Refusals / Calls blank for Sakis
-    widths = [6, 34, 22, 10, 12, 11, 13]
-    for j, w in enumerate(widths, 1):
+    for j, w in enumerate([16, 34, 22, 14], 1):
         ws.column_dimensions[chr(64 + j)].width = w
     ws.freeze_panes = "A2"
+
+    ref = wb.create_sheet("Reference")
+    ref.cell(row=1, column=1, value="Valid Region values (name or code)").font = \
+        Font(bold=True)
+    ref.cell(row=2, column=1, value="Region (NUTS-2)").font = Font(bold=True)
+    ref.cell(row=2, column=2, value="Code").font = Font(bold=True)
+    seen = []
+    for r in state.get("sample", []):
+        if r["region"] not in seen:
+            seen.append(r["region"])
+    for i, name in enumerate(seen, start=3):
+        ref.cell(row=i, column=1, value=name)
+        ref.cell(row=i, column=2, value=REGION_CODES.get(_norm(name), ""))
+    base = len(seen) + 4
+    ref.cell(row=base, column=1, value="Valid Urban/Rural values").font = Font(bold=True)
+    ref.cell(row=base + 1, column=1, value="Αστικά")
+    ref.cell(row=base + 2, column=1, value="Αγροτικά/Ημιαστικά")
+    ref.column_dimensions["A"].width = 34
+    ref.column_dimensions["B"].width = 10
 
     buf = io.BytesIO()
     wb.save(buf)
@@ -110,9 +159,8 @@ def _read_any(upload) -> pd.DataFrame:
     name = getattr(upload, "name", "").lower()
     if name.endswith(".csv"):
         return pd.read_csv(upload)
-    # prefer the named template sheet, else the first sheet
     xls = pd.ExcelFile(upload, engine="openpyxl")
-    sheet = TEMPLATE_SHEET if TEMPLATE_SHEET in xls.sheet_names else xls.sheet_names[0]
+    sheet = RESP_SHEET if RESP_SHEET in xls.sheet_names else xls.sheet_names[0]
     return xls.parse(sheet)
 
 
@@ -120,15 +168,15 @@ def _colmap(df: pd.DataFrame) -> dict:
     out = {}
     for col in df.columns:
         n = _norm(col)
-        if n == "id" or n.startswith("id "):
+        if "status" in n or "κατασ" in n:
+            out["status"] = col
+        elif "interview" in n or n in ("id", "case", "caseid", "key"):
             out["id"] = col
-        elif "region" in n or "nuts" in n:
+        elif "region" in n or "nuts" in n or "περιφ" in n:
             out["region"] = col
-        elif "urban" in n or "rural" in n or "αστ" in n or "αγρ" in n:
+        elif "urban" in n or "rural" in n or "αστ" in n or "αγρ" in n or "αστικ" in n:
             out["type"] = col
-        elif n == "target":
-            out["target"] = col
-        elif "complet" in n:
+        elif "complet" in n and "status" not in n:
             out["completes"] = col
         elif "refus" in n:
             out["refusals"] = col
@@ -138,79 +186,78 @@ def _colmap(df: pd.DataFrame) -> dict:
 
 
 def parse_upload(upload, state: dict) -> dict:
-    """Return {updates, mode, warnings}. 'updates' is a list of per-stratum dicts
-    with old/new values for preview; nothing is written here."""
-    df = _read_any(upload)
-    df = df.dropna(how="all")
+    """Return {updates, mode, warnings, counted, excluded}. Nothing is written."""
+    df = _read_any(upload).dropna(how="all")
     cm = _colmap(df)
-    by_id, by_rt = _lookups(state)
+    by_id, by_rt, by_code = _lookups(state)
     warnings: list[str] = []
+    excluded = 0
 
     def to_int(v):
         try:
-            if pd.isna(v):
-                return None
-            return int(round(float(v)))
+            return None if pd.isna(v) else int(round(float(v)))
         except (TypeError, ValueError):
             return None
 
-    # decide mode: aggregated (has a completes column) vs raw per-interview
+    if "region" not in cm or "type" not in cm:
+        raise ValueError("Need a Region column and an Urban/Rural column. "
+                         "Found: " + ", ".join(map(str, df.columns)))
+
+    agg: dict[int, dict] = {}
+
     if "completes" in cm:
-        mode = "per-stratum"
-        agg: dict[int, dict] = {}
+        # already aggregated per stratum
+        mode = "per-stratum totals"
         for _, row in df.iterrows():
-            target_row = None
-            if "id" in cm and to_int(row[cm["id"]]) in by_id:
-                target_row = by_id[to_int(row[cm["id"]])]
-            elif "region" in cm and "type" in cm:
-                key = (_norm(row[cm["region"]]), _norm(_urban_rural(row[cm["type"]])))
-                target_row = by_rt.get(key)
-            if not target_row:
-                warnings.append(f"Row not matched to a stratum: "
-                                f"{row.get(cm.get('region'), '?')} / "
-                                f"{row.get(cm.get('type'), '?')}")
+            tr = (by_id.get(to_int(row[cm["id"]])) if "id" in cm else None) \
+                or _match_stratum(row[cm["region"]], row[cm["type"]], by_rt, by_code)
+            if not tr:
+                warnings.append(f"Row not matched: {row[cm['region']]} / {row[cm['type']]}")
                 continue
-            d = agg.setdefault(int(target_row["id"]), {})
+            d = agg.setdefault(int(tr["id"]), {})
             c = to_int(row[cm["completes"]])
             if c is not None:
                 d["completes"] = c
-            if "refusals" in cm and to_int(row[cm["refusals"]]) is not None:
-                d["refusals"] = to_int(row[cm["refusals"]])
-            if "calls" in cm and to_int(row[cm["calls"]]) is not None:
-                d["calls"] = to_int(row[cm["calls"]])
+            for k in ("refusals", "calls"):
+                if k in cm and to_int(row[cm[k]]) is not None:
+                    d[k] = to_int(row[cm[k]])
+        counted = sum(v.get("completes", 0) for v in agg.values())
     else:
-        # raw: one completed interview per row -> count by region × urbanity
-        if "region" not in cm or "type" not in cm:
-            raise ValueError("Could not find the columns to read. Expected a "
-                             "'Completes' column (template), or 'Region' + "
-                             "'Urban/Rural' columns (raw export).")
-        mode = "raw (counted per stratum)"
-        agg = {}
+        # raw responses: one completed interview per row
+        mode = "raw responses (counted per stratum)"
+        if "id" in cm:
+            df = df.drop_duplicates(subset=[cm["id"]])
         for _, row in df.iterrows():
-            key = (_norm(row[cm["region"]]), _norm(_urban_rural(row[cm["type"]])))
-            tr = by_rt.get(key)
+            if "status" in cm and not _is_complete(row[cm["status"]]):
+                excluded += 1
+                continue
+            tr = _match_stratum(row[cm["region"]], row[cm["type"]], by_rt, by_code)
             if not tr:
                 warnings.append(f"Interview not matched: {row[cm['region']]} / "
                                 f"{row[cm['type']]}")
                 continue
             d = agg.setdefault(int(tr["id"]), {})
             d["completes"] = d.get("completes", 0) + 1
+        counted = sum(v.get("completes", 0) for v in agg.values())
 
-    # build preview updates
+    # every stratum appears in the preview (0 if absent from the file)
     updates = []
-    for sid, vals in sorted(agg.items()):
+    for sid in sorted(by_id):
         cur = by_id[sid]
-        upd = {"id": sid, "region": cur["region"], "type": cur["type"],
-               "old_completes": cur.get("completes", 0),
-               "new_completes": vals.get("completes", cur.get("completes", 0)),
-               "new_refusals": vals.get("refusals"),
-               "new_calls": vals.get("calls")}
-        updates.append(upd)
-    return {"updates": updates, "mode": mode, "warnings": warnings}
+        vals = agg.get(sid, {})
+        updates.append({
+            "id": sid, "region": cur["region"], "type": cur["type"],
+            "old_completes": cur.get("completes", 0),
+            "new_completes": vals.get("completes", 0),
+            "new_refusals": vals.get("refusals"),
+            "new_calls": vals.get("calls"),
+        })
+    return {"updates": updates, "mode": mode, "warnings": warnings,
+            "counted": counted, "excluded": excluded}
 
 
 def apply_updates(state: dict, updates: list[dict]) -> None:
-    by_id, _ = _lookups(state)
+    by_id, _, _ = _lookups(state)
     for u in updates:
         row = by_id[u["id"]]
         row["completes"] = int(u["new_completes"])

@@ -31,17 +31,20 @@ st.progress(min(t["pct"] / 100, 1.0))
 st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
 
 # ---------------------------------------------------- daily upload workflow
-st.markdown("#### 📤 Daily update — upload Sakis's Survey Solutions file")
+st.markdown("#### 📤 Daily update — upload Sakis's raw responses file")
+st.caption("One row per completed interview (all interviews so far). The app "
+           "counts rows per region × urbanity stratum. Strata absent from the "
+           "file are treated as 0, since the file is the full cumulative set.")
 dl, up = st.columns([1, 2])
 with dl:
     st.download_button(
         "⬇️ Template for Sakis (.xlsx)", data=sample_io.build_template(state),
-        file_name="Sample_Daily_Update_Template.xlsx",
+        file_name="Sample_Daily_Responses_Template.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        help="Pre-filled with the 26 strata. Sakis fills cumulative completes "
-             "and uploads it back here.")
+        help="Defines the columns to keep (Interview ID, Region, Urban/Rural, "
+             "optional Status) and lists the valid region/urbanity values.")
 with up:
-    uploaded = st.file_uploader("Upload the daily file (.xlsx or .csv)",
+    uploaded = st.file_uploader("Upload the responses file (.xlsx or .csv)",
                                 type=["xlsx", "xls", "csv"], key="sample_upload")
 
 if uploaded is not None:
@@ -50,11 +53,13 @@ if uploaded is not None:
     except Exception as exc:  # surface a friendly message rather than a trace
         st.error(f"Couldn't read that file: {exc}")
     else:
-        st.caption(f"Detected format: **{result['mode']}** · "
-                   f"{len(result['updates'])} strata in file")
+        note = f"Detected format: **{result['mode']}** · {result['counted']} completes counted"
+        if result["excluded"]:
+            note += f" · {result['excluded']} row(s) excluded by status"
+        st.caption(note)
         if result["warnings"]:
             with st.expander(f"⚠️ {len(result['warnings'])} row(s) not matched"):
-                for w in result["warnings"]:
+                for w in result["warnings"][:50]:
                     st.write("- " + w)
         prev = pd.DataFrame([{
             "Region": u["region"], "Urban/Rural": u["type"],
@@ -64,8 +69,7 @@ if uploaded is not None:
         } for u in result["updates"]])
         changed = prev[prev["Δ"] != 0]
         st.markdown(f"**Preview** — {len(changed)} strata change. "
-                    f"New total completes: "
-                    f"**{sum(u['new_completes'] for u in result['updates'])}**")
+                    f"New total completes: **{result['counted']}**")
         st.dataframe(changed if not changed.empty else prev,
                      hide_index=True, use_container_width=True)
         if st.button("✅ Apply this update", type="primary"):

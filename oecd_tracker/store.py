@@ -182,6 +182,19 @@ def _migrate(state: dict) -> dict:
         for ss in sp.get("subtasks", []):
             if (sp["id"], ss.get("id")) not in state_subs and sp["id"] in state_phases:
                 state_phases[sp["id"]]["subtasks"].append(dict(ss))
+
+    # refresh the system-defined Sakis task's wording (preserve reported pct).
+    seed_p47 = next((s for p in seed["phases"] if p["id"] == "P4"
+                     for s in p["subtasks"] if s.get("id") == "P4-7"), None)
+    if seed_p47:
+        for p in state.get("phases", []):
+            if p["id"] != "P4":
+                continue
+            for s in p.get("subtasks", []):
+                if s.get("id") == "P4-7":
+                    for k in ("task", "notes", "owner", "type", "weight",
+                              "due", "assign_by"):
+                        s[k] = seed_p47.get(k, s.get(k))
     return state
 
 
