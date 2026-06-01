@@ -152,21 +152,35 @@ def set_task_pct(state: dict, ref, pct: float) -> None:
 
 
 # -------------------------------------------------------------- weekly to-do
+def _todo_sort(t: dict):
+    """Categorise: first by due date, then by owner, then by importance
+    (heavier sub-tasks first)."""
+    return (t["due"] or date.max, (t["owner"] or "").lower(), -t.get("weight", 1))
+
+
 def weekly_view(state: dict) -> dict:
-    """Current-week tasks plus carried-over (overdue) open tasks, and a preview
-    of upcoming weeks."""
+    """Pending tasks (current-week + carried-over overdue) plus a preview of
+    upcoming weeks, all ordered by due date -> owner -> importance."""
     cw = project_week(state, today(state))
     all_tasks = tasks(state)
     open_tasks = [t for t in all_tasks if t["pct"] < 100]
 
-    carried = sorted([t for t in open_tasks if (t["week"] or 0) < cw],
-                     key=lambda t: (t["due"] or date.max))
-    this_week = sorted([t for t in all_tasks if t["week"] == cw],
-                       key=lambda t: (t["due"] or date.max))
-    upcoming = sorted([t for t in open_tasks if (t["week"] or 0) > cw],
-                      key=lambda t: (t["due"] or date.max))
-    return {"current_week": cw, "range": week_range(state, cw),
+    carried = sorted([t for t in open_tasks if (t["week"] or 0) < cw], key=_todo_sort)
+    this_week = sorted([t for t in all_tasks if t["week"] == cw], key=_todo_sort)
+    upcoming = sorted([t for t in open_tasks if (t["week"] or 0) > cw], key=_todo_sort)
+    # combined pending list (everything due by the end of this week, still open)
+    pending = sorted([t for t in open_tasks if (t["week"] or 0) <= cw], key=_todo_sort)
+    return {"current_week": cw, "range": week_range(state, cw), "pending": pending,
             "carried": carried, "this_week": this_week, "upcoming": upcoming}
+
+
+def set_phase_complete(state: dict, phase_id: str, done: bool) -> None:
+    """Mark a contractual deliverable submitted/withdrawn: bulk-set every
+    sub-task of the matching phase to 100% (done) or 0% (not done)."""
+    for p in state.get("phases", []):
+        if p["id"] == phase_id:
+            for s in p.get("subtasks", []):
+                s["pct"] = 100 if done else 0
 
 
 # --------------------------------------------------------------- phase rollup
@@ -302,7 +316,8 @@ def member_workload(state: dict) -> dict[str, list[dict]]:
         item = {**t, "assign_overdue": bool(t["assign_by"] and t["assign_by"] < now)}
         grouped.setdefault(owner, []).append(item)
     for k in grouped:
-        grouped[k].sort(key=lambda x: (x["assign_by"] or date.max))
+        # within a member: soonest due first, then most important
+        grouped[k].sort(key=lambda x: (x["due"] or date.max, -x.get("weight", 1)))
     return dict(sorted(grouped.items(), key=lambda kv: -len(kv[1])))
 
 

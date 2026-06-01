@@ -129,10 +129,46 @@ def _write(data: dict) -> None:
         _file_write(data)
 
 
+def _migrate(state: dict) -> dict:
+    """Backfill task-model fields onto data saved by an older app version, so
+    existing state.json files gain due/assign-by dates, weights, etc. without
+    touching the user's reported progress (pct / done / text)."""
+    seed = _load_seed()
+    sub_fields = ("type", "weight", "effort_days", "due", "assign_by")
+
+    seed_sub = {s["id"]: s for p in seed.get("phases", []) for s in p["subtasks"]}
+    for p in state.get("phases", []):
+        for s in p.get("subtasks", []):
+            ref = seed_sub.get(s.get("id"))
+            if ref:
+                for k in sub_fields:
+                    if not s.get(k):
+                        s[k] = ref.get(k)
+
+    seed_tw = {t["id"]: t for t in seed.get("this_week", [])}
+    for t in state.get("this_week", []):
+        ref = seed_tw.get(t.get("id"))
+        if ref:
+            for k in ("type", "weight", "effort_days", "assign_by"):
+                if not t.get(k):
+                    t[k] = ref.get(k)
+
+    seed_cp = {c["id"]: c for c in seed.get("critical_path", [])}
+    for c in state.get("critical_path", []):
+        if not c.get("phase"):
+            c["phase"] = seed_cp.get(c.get("id"), {}).get("phase", "")
+
+    seed_rk = {r["id"]: r for r in seed.get("risks", [])}
+    for r in state.get("risks", []):
+        if not r.get("phase"):
+            r["phase"] = seed_rk.get(r.get("id"), {}).get("phase", "")
+    return state
+
+
 def get_state() -> dict:
     """Return the live state, loading it into the Streamlit session once."""
     if "state" not in st.session_state:
-        st.session_state["state"] = _read()
+        st.session_state["state"] = _migrate(_read())
     return st.session_state["state"]
 
 

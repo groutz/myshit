@@ -13,7 +13,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 import logic
-from store import get_state
+from store import get_state, save_state
 from ui import badge, page_header, setup
 
 setup("Dashboard", "📊")
@@ -141,7 +141,7 @@ st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
 # ----------------------------------------------------- team workload
 st.markdown("#### 👥 Team — key open tasks, with assign-by dates")
 st.caption("'Assign by' is back-calculated from each task's due date minus the "
-           "estimated effort, so work starts early enough to finish on time.")
+           "estimated effort. Click a member to update their task status here.")
 workload = logic.member_workload(state)
 if not workload:
     st.success("No open tasks assigned.")
@@ -150,18 +150,42 @@ else:
     for i, (owner, items) in enumerate(workload.items()):
         with cols[i % 2]:
             with st.container(border=True):
-                st.markdown(f"**{owner}** · {len(items)} open")
-                for t in items[:5]:
-                    due = t["due"].strftime("%d %b") if t["due"] else "—"
+                with st.popover(f"👤 **{owner}** · {len(items)} open",
+                                use_container_width=True):
+                    st.caption(f"Update {owner}'s task status, then save.")
+                    updates: dict = {}
+                    for t in items:
+                        due = t["due"].strftime("%d %b") if t["due"] else "—"
+                        ab = t["assign_by"].strftime("%d %b") if t["assign_by"] else "—"
+                        warn = "🔴 " if t["assign_overdue"] else ""
+                        st.markdown(f"**{t['title']}**")
+                        st.caption(f"`{t['group']}` · {warn}assign by {ab} · due {due}")
+                        k = f"dash_{owner}_{t['id']}"
+                        if t["type"] == "binary":
+                            v = st.checkbox("Done", value=t["pct"] >= 100, key=k)
+                            updates[t["id"]] = (t["ref"], 100.0 if v else 0.0)
+                        else:
+                            v = st.slider("% complete", 0, 100, int(t["pct"]),
+                                          step=5, key=k)
+                            updates[t["id"]] = (t["ref"], float(v))
+                        st.divider()
+                    if st.button("💾 Save", key=f"save_{owner}", type="primary"):
+                        for _id, (ref, pct) in updates.items():
+                            logic.set_task_pct(state, ref, pct)
+                        save_state()
+                        st.rerun()
+                # compact preview under the button
+                for t in items[:4]:
                     ab = t["assign_by"].strftime("%d %b") if t["assign_by"] else "—"
+                    due = t["due"].strftime("%d %b") if t["due"] else "—"
                     warn = "🔴 " if t["assign_overdue"] else ""
                     st.markdown(
-                        f"- {t['title'][:70]}  \n"
-                        f"<span class='kpi-note'>`{t['group']}` · "
-                        f"{warn}assign by **{ab}** · due {due} · {t['pct']:.0f}%</span>",
+                        f"- {t['title'][:64]}  \n"
+                        f"<span class='kpi-note'>`{t['group']}` · {warn}assign "
+                        f"by **{ab}** · due {due} · {t['pct']:.0f}%</span>",
                         unsafe_allow_html=True)
 
 st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
 st.caption(f"Today (live): **{now:%A %d %B %Y}**  ·  Week "
            f"{logic.project_week(state, now)} from assignment. Report progress "
-           f"on **Weekly To-Do**; this dashboard re-rolls on every save.")
+           f"on **Pending Tasks**; this dashboard re-rolls on every save.")
