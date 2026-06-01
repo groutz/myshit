@@ -2,14 +2,11 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import streamlit as st
 
 from logic import STATUS_COLOUR
 
 PROJECT = "OECD/INFE 2026 — Greece"
-LOGO = Path(__file__).resolve().parent / "assets" / "kapa_logo.png"
 
 # Arial across the whole app (UI, widgets, headings, tables) + small styling.
 _CSS = """
@@ -25,6 +22,14 @@ h1, h2, h3, h4, h5, h6, p, div, span, label, .stMarkdown, .stDataFrame {
 .kpi-note {color:#5f6368; font-size:0.8rem; margin-top:-8px;}
 .section-rule {border:none; border-top:2px solid #e8eaed; margin:1.2rem 0 0.6rem;}
 .accent {border-left:4px solid #0b2e59; padding-left:10px;}
+/* Hide the Material Symbols chevron on popover triggers, which can render as
+   raw text ("expand_more") when the icon font isn't available. */
+[data-testid="stPopover"] button span[data-testid="stIconMaterial"],
+[data-testid="stPopoverButton"] span[data-testid="stIconMaterial"],
+[data-testid="stPopover"] button span.material-symbols-rounded,
+[data-testid="stPopover"] button span.material-symbols-outlined {
+    display: none !important;
+}
 </style>
 """
 
@@ -32,12 +37,6 @@ h1, h2, h3, h4, h5, h6, p, div, span, label, .stMarkdown, .stDataFrame {
 def setup(title: str, icon: str = "📊") -> None:
     st.set_page_config(page_title=f"{title} · PM Tracker", page_icon=icon,
                        layout="wide", initial_sidebar_state="expanded")
-    # Kapa Research logo, upper-left (and atop the sidebar).
-    if LOGO.exists() and hasattr(st, "logo"):
-        try:
-            st.logo(str(LOGO), size="large")
-        except TypeError:        # older Streamlit without the size kwarg
-            st.logo(str(LOGO))
     st.markdown(_CSS, unsafe_allow_html=True)
 
 
