@@ -73,6 +73,21 @@ def week_range(state: dict, week_no: int) -> tuple[date, date]:
     return start, start + timedelta(days=6)
 
 
+def assign_by_date(due, effort_days: int, state: dict) -> str:
+    """Back-calculate the 'assign by' date: due − effort − 1 buffer day, snapped
+    to a weekday and not before the assignment date."""
+    d = parse_date(due)
+    if d is None:
+        return ""
+    ab = d - timedelta(days=(effort_days or 1) + 1)
+    floor = _assignment(state)
+    if ab < floor:
+        ab = floor
+    while ab.weekday() >= 5:          # nudge weekends back to Friday
+        ab -= timedelta(days=1)
+    return ab.isoformat()
+
+
 # ------------------------------------------------------------------- statuses
 def derive_status(pct: float, shadow: date | None, contract: date | None,
                   now: date) -> str:

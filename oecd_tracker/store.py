@@ -31,6 +31,9 @@ STATE_FILE = BASE / "state.json"
 # column A and re-join on read, so it scales safely as the logs fill up.
 _CHUNK = 45000
 
+# Bumped when a one-time structural migration must run on older saved data.
+SCHEMA_VERSION = 1
+
 
 def _load_seed() -> dict:
     with open(SEED_FILE, encoding="utf-8") as fh:
@@ -173,35 +176,44 @@ def _migrate(state: dict) -> dict:
         state["weekly_reports"] = seed.get("weekly_reports", [])
         state.pop("friday_reports", None)
 
-    # ensure newly-added seed sub-tasks (e.g. Sakis's daily sample upload) land
-    # in existing state, matched by phase + sub-task id.
-    state_subs = {(p["id"], s.get("id"))
-                  for p in state.get("phases", []) for s in p.get("subtasks", [])}
-    state_phases = {p["id"]: p for p in state.get("phases", [])}
-    for sp in seed.get("phases", []):
-        for ss in sp.get("subtasks", []):
-            if (sp["id"], ss.get("id")) not in state_subs and sp["id"] in state_phases:
-                state_phases[sp["id"]]["subtasks"].append(dict(ss))
+    # One-time structural seeding (NOT idempotent vs deletion): only run when
+    # upgrading older data, so tasks the user removes in Project set-up stay
+    # removed instead of being re-injected on the next load.
+    if state.get("schema_version", 0) < 1:
+        state_subs = {(p["id"], s.get("id"))
+                      for p in state.get("phases", []) for s in p.get("subtasks", [])}
+        state_phases = {p["id"]: p for p in state.get("phases", [])}
+        for sp in seed.get("phases", []):
+            for ss in sp.get("subtasks", []):
+                if (sp["id"], ss.get("id")) not in state_subs and sp["id"] in state_phases:
+                    state_phases[sp["id"]]["subtasks"].append(dict(ss))
 
-    # refresh the system-defined Sakis task's wording (preserve reported pct).
-    seed_p47 = next((s for p in seed["phases"] if p["id"] == "P4"
-                     for s in p["subtasks"] if s.get("id") == "P4-7"), None)
-    if seed_p47:
-        for p in state.get("phases", []):
-            if p["id"] != "P4":
-                continue
-            for s in p.get("subtasks", []):
-                if s.get("id") == "P4-7":
-                    for k in ("task", "notes", "owner", "type", "weight",
-                              "due", "assign_by"):
-                        s[k] = seed_p47.get(k, s.get(k))
+        # refresh the system-defined Sakis task's wording (preserve reported pct).
+        seed_p47 = next((s for p in seed["phases"] if p["id"] == "P4"
+                         for s in p["subtasks"] if s.get("id") == "P4-7"), None)
+        if seed_p47:
+            for p in state.get("phases", []):
+                if p["id"] != "P4":
+                    continue
+                for s in p.get("subtasks", []):
+                    if s.get("id") == "P4-7":
+                        for k in ("task", "notes", "owner", "type", "weight",
+                                  "due", "assign_by"):
+                            s[k] = seed_p47.get(k, s.get(k))
+
+    state["schema_version"] = SCHEMA_VERSION
     return state
 
 
 def get_state() -> dict:
-    """Return the live state, loading it into the Streamlit session once."""
+    """Return the live state, loading it into the Streamlit session once.
+    Persist once if a one-time structural migration was applied."""
     if "state" not in st.session_state:
-        st.session_state["state"] = _migrate(_read())
+        raw = _read()
+        old_version = raw.get("schema_version", 0)
+        st.session_state["state"] = _migrate(raw)
+        if old_version < SCHEMA_VERSION:
+            save_state()
     return st.session_state["state"]
 
 
