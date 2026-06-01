@@ -1,20 +1,22 @@
 """Derived metrics for the PM Tracker.
 
-Everything the dashboard shows is computed here from the live state, so that
-ticking a task or typing a number anywhere in the app instantly re-rolls
-progress, statuses, countdowns and the "upcoming tasks" list.
+Tasks are the single source of truth: every phase sub-task (and the pre-kickoff
+prep tasks) carries a weight, a type (binary / percent), a shadow-based due date
+and an effort estimate. From those we derive phase %, milestone %, the weekly
+to-do buckets, per-owner workloads, and the status of critical-path items and
+risks — so the user only ever reports task progress and the rest fills in.
 """
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 # Status vocabulary mapped to the README colour code.
-STATUS_DONE = "Done"            # green
-STATUS_ON_TRACK = "On track"    # green
-STATUS_AT_RISK = "At risk"      # amber
-STATUS_SLIPPING = "Slipping"    # red
-STATUS_NOT_STARTED = "Not started"  # grey
+STATUS_DONE = "Done"
+STATUS_ON_TRACK = "On track"
+STATUS_AT_RISK = "At risk"
+STATUS_SLIPPING = "Slipping"
+STATUS_NOT_STARTED = "Not started"
 
 STATUS_COLOUR = {
     STATUS_DONE: "#1e8e3e",
@@ -22,14 +24,12 @@ STATUS_COLOUR = {
     STATUS_AT_RISK: "#f9a825",
     STATUS_SLIPPING: "#d93025",
     STATUS_NOT_STARTED: "#9aa0a6",
-    # critical-path / risk vocab
-    "Open": "#f9a825",
-    "Closed": "#1e8e3e",
-    "In progress": "#f9a825",
-    "Blocked": "#d93025",
+    "Open": "#f9a825", "Closed": "#1e8e3e", "In progress": "#f9a825",
+    "Blocked": "#d93025", "Not started ": "#9aa0a6",
 }
 
 
+# --------------------------------------------------------------- date helpers
 def parse_date(s) -> date | None:
     if s is None or s == "":
         return None
@@ -46,10 +46,8 @@ def parse_date(s) -> date | None:
 
 
 def today(state: dict) -> date:
-    """Live 'today', overridable from Settings for what-if scenarios."""
     override = state.get("settings", {}).get("today_override")
-    d = parse_date(override)
-    return d or date.today()
+    return parse_date(override) or date.today()
 
 
 def days_between(a: date | None, b: date | None) -> int | None:
@@ -58,10 +56,26 @@ def days_between(a: date | None, b: date | None) -> int | None:
     return (b - a).days
 
 
+def _assignment(state: dict) -> date:
+    return parse_date(state.get("settings", {}).get("assignment_date")) or date(2026, 5, 14)
+
+
+def project_week(state: dict, d: date | None) -> int | None:
+    """1-based project week from the assignment date (7-day blocks)."""
+    if d is None:
+        return None
+    delta = (d - _assignment(state)).days
+    return max(1, delta // 7 + 1)
+
+
+def week_range(state: dict, week_no: int) -> tuple[date, date]:
+    start = _assignment(state) + timedelta(days=7 * (week_no - 1))
+    return start, start + timedelta(days=6)
+
+
+# ------------------------------------------------------------------- statuses
 def derive_status(pct: float, shadow: date | None, contract: date | None,
                   now: date) -> str:
-    """Status from % complete vs the internal (shadow) and external (contract)
-    dates. Shadow is the early-warning trigger; slipping past contract is red."""
     pct = pct or 0
     if pct >= 100:
         return STATUS_DONE
@@ -71,7 +85,6 @@ def derive_status(pct: float, shadow: date | None, contract: date | None,
         if shadow and now > shadow:
             return STATUS_AT_RISK
         return STATUS_NOT_STARTED
-    # in progress
     if contract and now > contract:
         return STATUS_SLIPPING
     if shadow and now > shadow:
@@ -79,32 +92,102 @@ def derive_status(pct: float, shadow: date | None, contract: date | None,
     return STATUS_ON_TRACK
 
 
-# ---------------------------------------------------------------- milestones
-def milestone_rows(state: dict) -> list[dict]:
+# ----------------------------------------------------------------- task model
+def _task_pct(t: dict) -> float:
+    """Normalised 0-100 for any task (prep tasks use the done flag)."""
+    if "pct" in t and t.get("type") != "_prep":
+        return float(t.get("pct", 0) or 0)
+    return 100.0 if t.get("done") else 0.0
+
+
+def tasks(state: dict) -> list[dict]:
+    """Flat list of every reportable task with computed week / assign-by."""
     now = today(state)
-    out = []
-    for m in state.get("milestones", []):
-        shadow = parse_date(m.get("shadow"))
-        contract = parse_date(m.get("contract"))
+    out: list[dict] = []
+
+    # pre-kickoff prep tasks
+    for t in state.get("this_week", []):
+        due = parse_date(t.get("due"))
+        pct = 100.0 if t.get("done") else 0.0
         out.append({
-            **m,
-            "status": derive_status(m.get("pct", 0), shadow, contract, now),
-            "days_to_shadow": days_between(now, shadow),
-            "days_to_contract": days_between(now, contract),
+            "id": f"PREP-{t['id']}", "group": "PREP", "group_name": "Pre-kickoff prep",
+            "title": t.get("action", ""), "owner": t.get("owner", ""),
+            "type": "binary", "weight": t.get("weight", 1), "pct": pct,
+            "done": bool(t.get("done")), "due": due,
+            "assign_by": parse_date(t.get("assign_by")),
+            "effort_days": t.get("effort_days", 1),
+            "week": project_week(state, due), "ref": ("this_week", t["id"]),
+            "overdue": bool(due and due < now and pct < 100),
         })
+
+    # phase sub-tasks
+    for pi, p in enumerate(state.get("phases", [])):
+        for si, s in enumerate(p.get("subtasks", [])):
+            due = parse_date(s.get("due"))
+            pct = float(s.get("pct", 0) or 0)
+            out.append({
+                "id": s.get("id", f"{p['id']}-{si+1}"), "group": p["id"],
+                "group_name": p["name"], "title": s.get("task", ""),
+                "owner": s.get("owner", ""), "type": s.get("type", "percent"),
+                "weight": s.get("weight", 1), "pct": pct,
+                "done": pct >= 100, "due": due,
+                "assign_by": parse_date(s.get("assign_by")),
+                "effort_days": s.get("effort_days", 1),
+                "week": project_week(state, due), "ref": ("phase", pi, si),
+                "overdue": bool(due and due < now and pct < 100),
+            })
     return out
 
 
-# -------------------------------------------------------------------- phases
+def set_task_pct(state: dict, ref, pct: float) -> None:
+    """Write a reported value back to the right place in state."""
+    kind = ref[0]
+    if kind == "this_week":
+        for t in state["this_week"]:
+            if t["id"] == ref[1]:
+                t["done"] = pct >= 100
+    elif kind == "phase":
+        _, pi, si = ref
+        state["phases"][pi]["subtasks"][si]["pct"] = int(round(pct))
+
+
+# -------------------------------------------------------------- weekly to-do
+def weekly_view(state: dict) -> dict:
+    """Current-week tasks plus carried-over (overdue) open tasks, and a preview
+    of upcoming weeks."""
+    cw = project_week(state, today(state))
+    all_tasks = tasks(state)
+    open_tasks = [t for t in all_tasks if t["pct"] < 100]
+
+    carried = sorted([t for t in open_tasks if (t["week"] or 0) < cw],
+                     key=lambda t: (t["due"] or date.max))
+    this_week = sorted([t for t in all_tasks if t["week"] == cw],
+                       key=lambda t: (t["due"] or date.max))
+    upcoming = sorted([t for t in open_tasks if (t["week"] or 0) > cw],
+                      key=lambda t: (t["due"] or date.max))
+    return {"current_week": cw, "range": week_range(state, cw),
+            "carried": carried, "this_week": this_week, "upcoming": upcoming}
+
+
+# --------------------------------------------------------------- phase rollup
+def _weighted(items: list[dict]) -> float:
+    tot = sum(i.get("weight", 1) for i in items)
+    if not tot:
+        return 0.0
+    return round(sum(i.get("weight", 1) * _phase_sub_pct(i) for i in items) / tot, 1)
+
+
+def _phase_sub_pct(s: dict) -> float:
+    return float(s.get("pct", 0) or 0)
+
+
 def phase_rows(state: dict) -> list[dict]:
-    """Each phase rolls up to the mean of its sub-task %s; status derives from
-    that and the matching milestone date (phase order maps to milestone order)."""
     now = today(state)
     milestones = state.get("milestones", [])
     out = []
     for idx, p in enumerate(state.get("phases", [])):
         subs = p.get("subtasks", [])
-        pct = round(sum(s.get("pct", 0) for s in subs) / len(subs), 1) if subs else 0
+        pct = _weighted(subs)
         shadow = contract = None
         if idx < len(milestones):
             shadow = parse_date(milestones[idx].get("shadow"))
@@ -112,66 +195,122 @@ def phase_rows(state: dict) -> list[dict]:
         out.append({
             "id": p["id"], "name": p["name"], "window": p.get("window", ""),
             "pct": pct, "n_sub": len(subs),
-            "n_done": sum(1 for s in subs if s.get("pct", 0) >= 100),
+            "n_done": sum(1 for s in subs if _phase_sub_pct(s) >= 100),
             "status": derive_status(pct, shadow, contract, now),
         })
     return out
 
 
+def phase_pct_map(state: dict) -> dict[str, float]:
+    return {r["id"]: r["pct"] for r in phase_rows(state)}
+
+
 def overall_progress(state: dict) -> float:
-    """Project-wide implementation progress = mean % across every phase
-    sub-task (each sub-task weighted equally)."""
+    """Weighted mean across every phase sub-task (the implementation work)."""
     subs = [s for p in state.get("phases", []) for s in p.get("subtasks", [])]
-    if not subs:
-        return 0.0
-    return round(sum(s.get("pct", 0) for s in subs) / len(subs), 1)
+    return _weighted(subs)
 
 
-# ---------------------------------------------------------------- this week
-def thisweek_summary(state: dict) -> tuple[int, int]:
-    tasks = state.get("this_week", [])
-    done = sum(1 for t in tasks if t.get("done"))
-    return done, len(tasks)
-
-
-# ----------------------------------------------------------- upcoming tasks
-def upcoming_tasks(state: dict, limit: int = 12) -> list[dict]:
-    """Surface the next things to do: incomplete This-Week actions (with due
-    dates) plus in-flight / not-started phase sub-tasks, soonest first."""
+# ----------------------------------------------------------------- milestones
+def milestone_rows(state: dict) -> list[dict]:
+    """Milestone % is DERIVED from its matching phase (P1->M1 …), so reporting a
+    task instantly moves the milestone and clears stale Attention items."""
     now = today(state)
-    items: list[dict] = []
-
-    for t in state.get("this_week", []):
-        if t.get("done"):
-            continue
-        due = parse_date(t.get("due"))
-        items.append({
-            "source": "This Week",
-            "what": t.get("action", ""),
-            "owner": t.get("owner", ""),
-            "due": due,
-            "overdue": bool(due and due < now),
-            "pct": 100 if t.get("done") else 0,
+    phases = phase_rows(state)
+    out = []
+    for idx, m in enumerate(state.get("milestones", [])):
+        shadow = parse_date(m.get("shadow"))
+        contract = parse_date(m.get("contract"))
+        pct = phases[idx]["pct"] if idx < len(phases) else m.get("pct", 0)
+        out.append({
+            **m, "pct": pct,
+            "status": derive_status(pct, shadow, contract, now),
+            "days_to_shadow": days_between(now, shadow),
+            "days_to_contract": days_between(now, contract),
         })
+    return out
 
-    milestones = state.get("milestones", [])
-    for idx, p in enumerate(state.get("phases", [])):
-        # use the phase's milestone shadow date as the soft due date
-        due = parse_date(milestones[idx]["shadow"]) if idx < len(milestones) else None
-        for s in p.get("subtasks", []):
-            if s.get("pct", 0) >= 100:
-                continue
-            items.append({
-                "source": p["id"],
-                "what": s.get("task", ""),
-                "owner": s.get("owner", ""),
-                "due": due,
-                "overdue": bool(due and due < now),
-                "pct": s.get("pct", 0),
-            })
 
-    far = date.max
-    items.sort(key=lambda x: (x["due"] or far))
+# ------------------------------------------------------ critical path & risks
+def critical_path_rows(state: dict) -> list[dict]:
+    now = today(state)
+    pmap = phase_pct_map(state)
+    phases = {r["id"]: r for r in phase_rows(state)}
+    out = []
+    for c in state.get("critical_path", []):
+        ph = c.get("phase", "")
+        pct = pmap.get(ph, 0)
+        st = phases.get(ph, {}).get("status", STATUS_NOT_STARTED)
+        if pct >= 100:
+            status = "Closed"
+        elif st == STATUS_SLIPPING:
+            status = "Blocked"
+        elif st == STATUS_AT_RISK:
+            status = "At risk"
+        elif pct > 0:
+            status = "In progress"
+        else:
+            status = "Not started"
+        out.append({**c, "pct": pct, "status": status,
+                    "open": status not in ("Closed",)})
+    return out
+
+
+def risk_rows(state: dict) -> list[dict]:
+    pmap = phase_pct_map(state)
+    phases = {r["id"]: r for r in phase_rows(state)}
+    out = []
+    for r in state.get("risks", []):
+        ph = r.get("phase", "")
+        pct = pmap.get(ph, None)
+        st = phases.get(ph, {}).get("status")
+        if pct is None or ph == "":
+            status = "Open – monitored"
+        elif pct >= 100:
+            status = "Closed"
+        elif st == STATUS_SLIPPING:
+            status = "Open – elevated"
+        elif st == STATUS_AT_RISK:
+            status = "Open – active"
+        else:
+            status = "Open – monitored"
+        out.append({**r, "auto_status": status, "open": status != "Closed"})
+    return out
+
+
+def open_counts(state: dict) -> dict:
+    cp = critical_path_rows(state)
+    rk = risk_rows(state)
+    return {
+        "cp_open": sum(1 for c in cp if c["open"]),
+        "cp": cp,
+        "risk_open": sum(1 for r in rk if r["open"]),
+        "risk_high_open": sum(1 for r in rk if r["open"] and r.get("likelihood") == "High"),
+        "risks": rk,
+    }
+
+
+# ----------------------------------------------------------- team workloads
+def member_workload(state: dict) -> dict[str, list[dict]]:
+    """Open tasks grouped by owner, each with due + assign-by, soonest assign first."""
+    now = today(state)
+    grouped: dict[str, list[dict]] = {}
+    for t in tasks(state):
+        if t["pct"] >= 100:
+            continue
+        owner = (t["owner"] or "Unassigned").strip()
+        item = {**t, "assign_overdue": bool(t["assign_by"] and t["assign_by"] < now)}
+        grouped.setdefault(owner, []).append(item)
+    for k in grouped:
+        grouped[k].sort(key=lambda x: (x["assign_by"] or date.max))
+    return dict(sorted(grouped.items(), key=lambda kv: -len(kv[1])))
+
+
+# ----------------------------------------------------------- upcoming (short)
+def upcoming_tasks(state: dict, limit: int = 8) -> list[dict]:
+    now = today(state)
+    items = [t for t in tasks(state) if t["pct"] < 100]
+    items.sort(key=lambda t: (t["due"] or date.max))
     return items[:limit]
 
 
@@ -187,12 +326,8 @@ def sample_rows(state: dict) -> list[dict]:
         comp = r.get("completes", 0) or 0
         pct = round(100 * comp / target, 1) if target else 0
         under = pct < thr
-        out.append({
-            **r,
-            "pct": pct,
-            "booster": under and window_open,
-            "under_threshold": under,
-        })
+        out.append({**r, "pct": pct, "booster": under and window_open,
+                    "under_threshold": under})
     return out
 
 
@@ -201,8 +336,7 @@ def sample_totals(state: dict) -> dict:
     target = sum(r["target"] for r in rows)
     comp = sum(r["completes"] for r in rows)
     return {
-        "target": target,
-        "completes": comp,
+        "target": target, "completes": comp,
         "pct": round(100 * comp / target, 1) if target else 0,
         "refusals": sum(r.get("refusals", 0) for r in rows),
         "calls": sum(r.get("calls", 0) for r in rows),

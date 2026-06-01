@@ -22,15 +22,29 @@ Then open the URL Streamlit prints (default http://localhost:8501).
 
 | Page | What you do | What it drives |
 |------|-------------|----------------|
-| **Dashboard** | (read-only rollup) | KPIs, milestone & phase bars, alerts, upcoming tasks |
-| **This Week** | tick prep tasks Done | completion %, overdue alerts, upcoming list |
-| **Phases** | set % complete per sub-task | phase bars + overall progress + phase status |
-| **Milestones** | set % complete / dates | Green/Amber/Red/Grey status + days-to-shadow |
+| **Dashboard** | (read-only rollup) | overall progress bar, milestone & phase bars, clickable open critical-paths/risks, Attention, team workload |
+| **Weekly To-Do** | tick / slide this week's + carried-over tasks | **everything** — phase %, milestone %, critical paths, risks |
+| **Phases** | (advanced) edit % / see weights | weighted phase roll-up + overall progress |
+| **Milestones** | edit dates only (% is derived) | Green/Amber/Red/Grey status + days-to-shadow |
 | **Sample** | enter completes per stratum | % of target, booster flags, totals |
-| **Critical Path & Risks** | update status | open-item counts on the Dashboard |
+| **Critical Path & Risks** | edit wording/mitigations (status auto) | open-item counts on the Dashboard |
 | **Logs** | Friday reports, daily KPIs, interviewer bench, QA log | running operational record |
 | **Reference** | Team, Buffers, Kickoff Playbook, Project info | standing context |
+| **Project Status** | (read-only) | a client-safe written status note to download/share |
 | **Settings** | dates, targets, today-override, export/import, reset | what-if scenarios + backup |
+
+### The task model (how "report one thing, the rest fills in" works)
+
+Tasks are the single source of truth. Each task has a **type** (binary tick-box
+or 0–100% slider), a **weight**, an **effort estimate**, and a **shadow-based
+due date** from which an **"assign by" date** is computed (due − effort − buffer).
+
+- **Phase %** = the weighted roll-up of its sub-tasks (heavier tasks move it more).
+- **Milestone %** mirrors its phase (P1→M1 …) — so completing a task clears stale
+  Attention items automatically.
+- **Critical-path & risk status** derive from the phase each one depends on.
+- The **Weekly To-Do** shows the current project week (7-day blocks from the
+  assignment date) plus any overdue tasks carried over from earlier weeks.
 
 ## How status is derived
 

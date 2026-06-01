@@ -1,4 +1,8 @@
-"""Milestones — % complete + live dates → status & days-to-shadow countdown."""
+"""Milestones — dates are editable; % complete is DERIVED from each phase.
+
+Milestone i mirrors phase i (P1->M1 …), so reporting tasks moves the milestone
+automatically. Run to the Shadow date; the Ministry only sees the Contract column.
+"""
 
 from __future__ import annotations
 
@@ -12,53 +16,48 @@ from ui import badge, page_header, saved_toast, setup
 setup("Milestones", "🎯")
 state = get_state()
 page_header("Milestones — Shadow vs Contract",
-            "Run to the Shadow column (internal trigger ~7–10 days ahead). The "
-            "Ministry only ever sees the Contract column. Status auto-derives "
-            "from % complete vs today's date.")
+            "% complete is derived from the matching phase's weighted tasks — "
+            "report progress on Weekly To-Do and these move on their own. Here "
+            "you only adjust the dates if they change.")
 
-rows = logic.milestone_rows(state)
-
-# editable %; dates shown read-only here (change them in Settings if needed)
+# editable dates only
 df = pd.DataFrame([{
-    "id": r["id"], "name": r["name"], "contract": r["contract"],
-    "shadow": r["shadow"], "pct": r["pct"],
-} for r in state["milestones"]])
-df["contract"] = pd.to_datetime(df["contract"], errors="coerce")
-df["shadow"] = pd.to_datetime(df["shadow"], errors="coerce")
+    "id": m["id"], "name": m["name"],
+    "contract": logic.parse_date(m.get("contract")),
+    "shadow": logic.parse_date(m.get("shadow")),
+} for m in state["milestones"]])
 
 edited = st.data_editor(
     df,
     column_config={
         "id": st.column_config.NumberColumn("#", disabled=True, width="small"),
         "name": st.column_config.TextColumn("Milestone", width="large", disabled=True),
-        "contract": st.column_config.DateColumn("Contract", format="DD MMM YYYY"),
-        "shadow": st.column_config.DateColumn("Shadow", format="DD MMM YYYY"),
-        "pct": st.column_config.NumberColumn("% complete", min_value=0,
-                                             max_value=100, step=5),
+        "contract": st.column_config.DateColumn("Contract date", format="DD MMM YYYY"),
+        "shadow": st.column_config.DateColumn("Shadow date", format="DD MMM YYYY"),
     },
-    column_order=["id", "name", "contract", "shadow", "pct"],
+    column_order=["id", "name", "contract", "shadow"],
     hide_index=True, use_container_width=True, key="ms_editor",
 )
 
-if st.button("💾 Save", type="primary"):
-    out = edited.copy()
-    for col in ("contract", "shadow"):
-        out[col] = out[col].apply(lambda d: d.strftime("%Y-%m-%d") if pd.notna(d) else "")
-    by_id = {r["id"]: r for r in out.to_dict("records")}
+if st.button("💾 Save dates", type="primary"):
+    by_id = {r["id"]: r for r in edited.to_dict("records")}
     for m in state["milestones"]:
         upd = by_id.get(m["id"])
         if upd:
-            m.update({"contract": upd["contract"], "shadow": upd["shadow"],
-                      "pct": int(upd["pct"] or 0)})
+            for col in ("contract", "shadow"):
+                v = upd[col]
+                m[col] = v.strftime("%Y-%m-%d") if pd.notna(v) else ""
     save_state()
     saved_toast()
     st.rerun()
 
 st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
-st.markdown("#### Status & countdown")
+st.markdown("#### Derived status & countdown")
 for r in logic.milestone_rows(state):
-    cols = st.columns([2.6, 1, 1, 1.4])
-    cols[0].markdown(f"**{r['name']}**", help=r.get("why", ""))
+    cols = st.columns([2.4, 1.1, 1, 1.4])
+    with cols[0]:
+        st.markdown(f"**{r['name']}**", help=r.get("why", ""))
+        st.progress(min(int(r["pct"]), 100))
     cols[1].markdown(badge(r["status"]), unsafe_allow_html=True)
     dts = r["days_to_shadow"]
     dtc = r["days_to_contract"]
